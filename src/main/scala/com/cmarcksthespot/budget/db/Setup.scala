@@ -14,9 +14,7 @@ object Setup {
   private class Impl(db: Database) extends SetupImpl with SetupDep {
     override val accountsQueries = AccountQueries(db)
     override val transactionQueries = TransactionQueries(db)
-    override val budgetQueries = BudgetQueries(db)
-    override val goalQueries = GoalQueries(db)
-    override val categoryQueries = CategoryQueries(db)
+    override val allocationQueries = AllocationQueries(db)
   }
   def apply(db: Database): Setup = new Impl(db)
 }
@@ -24,9 +22,7 @@ object Setup {
 private[db] trait SetupDep {
   val accountsQueries: AccountQueries
   val transactionQueries: TransactionQueries
-  val budgetQueries: BudgetQueries
-  val goalQueries: GoalQueries
-  val categoryQueries: CategoryQueries
+  val allocationQueries: AllocationQueries
 }
 
 private[db] trait SetupImpl extends Setup {
@@ -35,10 +31,8 @@ private[db] trait SetupImpl extends Setup {
   override def createTables(): Future[Unit] = {
     for {
       _ <- accountsQueries.createTable()
+      _ <- allocationQueries.createTable()
       _ <- transactionQueries.createTable()
-      _ <- budgetQueries.createTable()
-      _ <- goalQueries.createTable()
-      _ <- categoryQueries.createTable()
     } yield ()
   }
 }
