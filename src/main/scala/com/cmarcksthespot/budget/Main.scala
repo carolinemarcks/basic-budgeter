@@ -16,7 +16,7 @@ object Main {
 
   def appSetup() = {
     val db = Database.forConfig("db.default")
-    Await.ready(Setup(db).createTables(), Duration.Inf)
+    Await.result(Setup(db).createTables(), Duration.Inf)
 
     (DefaultApiRouter.createService(new DefaultApiImpl()), { () => db.close() })
   }
