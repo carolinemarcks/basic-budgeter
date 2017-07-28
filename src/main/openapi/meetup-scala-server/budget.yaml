@@ -38,6 +38,23 @@ definitions:
       cap:
         type: integer
         format: int32
+  GoalBody:
+    required:
+      - name
+      - saved
+      - weight
+    properties:
+      name:
+        type: string
+      saved:
+        type: integer
+        format: int32
+      weight:
+        type: integer
+        format: int32
+      cap:
+        type: integer
+        format: int32
   Budget:
     required:
       - id
@@ -59,6 +76,24 @@ definitions:
       cap:
         type: integer
         format: int32
+  BudgetBody:
+    required:
+      - name
+      - saved
+      - amount
+    properties:
+      name:
+        type: string
+      saved:
+        type: integer
+        format: int32
+      amount:
+        type: integer
+        format: int32
+      cap:
+        type: integer
+        format: int32
+
 
 paths:
   /ping:
@@ -71,22 +106,92 @@ paths:
           schema:
             $ref: "#/definitions/Status"
   /allocations/budgets:
+    post:
+      description: create new budget
+      operationId: createBudget
+      parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          $ref: "#/definitions/BudgetBody"
+      responses:
+        204:
+          description: newly defined budget
+          schema:
+            $ref: "#/definitions/Budget"
     get:
       description: get a list of all budgets
       operationId: getBudgets
       responses:
         200:
+          description: all budgets
           schema:
             type: array
             items:
               $ref: "#/definitions/Budget"
+  /allocations/budgets/{budgetId}:
+    post:
+      description: update existing budget
+      operationId: updateBudget
+      parameters:
+      - in: path
+        name: budgetId
+        required: true
+        type: integer
+        format: int32
+      - in: body
+        name: body
+        required: true
+        schema:
+          $ref: "#/definitions/BudgetBody"
+      responses:
+        200:
+          description: updated budget
+          schema:
+            $ref: "#/definitions/Budget"
   /allocations/goals:
+    post:
+      description: create a new goal
+      operationId: createGoal
+      parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          $ref: "#/definitions/GoalBody"
+      responses:
+        204:
+          description: newly defined goal
+          schema:
+            $ref: "#/definitions/Goal"
     get:
       description: get a list of all goals
       operationId: getGoals
       responses:
         200:
+          description: all goals
           schema:
             type: array
             items:
               $ref: "#/definitions/Goal"
+  /allocations/goals/{goalId}:
+    post:
+      description: update existing goal
+      operationId: updateGoal
+      parameters:
+      - in: path
+        name: goalId
+        required: true
+        type: integer
+        format: int32
+      - in: body
+        name: body
+        required: true
+        schema:
+          $ref: "#/definitions/GoalBody"
+      responses:
+        200:
+          description: updated goal
+          schema:
+            $ref: "#/definitions/Goal"

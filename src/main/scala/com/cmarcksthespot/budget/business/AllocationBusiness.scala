@@ -2,15 +2,23 @@ package com.cmarcksthespot.budget.business
 
 import com.cmarcksthespot.budget.db
 import com.cmarcksthespot.budget.db.queries.AllocationQueries
-import com.cmarcksthespot.budget.model.{Budget, Goal}
+import com.cmarcksthespot.budget.model.{Budget, BudgetBody, Goal, GoalBody}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 trait AllocationBusiness {
+  def createBudget(body: BudgetBody): Budget
+
+  def createGoal(body: GoalBody): Goal
+
   def getBudgets(): List[Budget]
 
   def getGoals(): List[Goal]
+
+  def updateBudget(budgetId: Int, body: BudgetBody): Budget
+
+  def updateGoal(goalId: Int, body: GoalBody): Goal
 }
 
 object AllocationBusiness {
@@ -24,6 +32,50 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
 
   override def getGoals(): List[Goal] = {
     Await.result(queries.getAllocations(db.model.Goal), Duration.Inf).flatMap(_.toGoal).toList
+  }
+
+  override def createBudget(body: BudgetBody): Budget = {
+    val fut = queries.createAllocation(
+      name = body.name,
+      saved = body.saved,
+      weight = body.amount,
+      cap = body.cap.getOrElse(0),
+      allocationType = db.model.Budget
+    )
+    Await.result(fut, Duration.Inf).toBudget.get
+  }
+
+  override def createGoal(body: GoalBody): Goal = {
+    val fut = queries.createAllocation(
+      name = body.name,
+      saved = body.saved,
+      weight = body.weight,
+      cap = body.cap.getOrElse(0),
+      allocationType = db.model.Goal
+    )
+    Await.result(fut, Duration.Inf).toGoal.get
+  }
+
+  override def updateGoal(goalId: Int, body: GoalBody): Goal = {
+    val fut = queries.updateAllocation(goalId,
+      name = body.name,
+      saved = body.saved,
+      weight = body.weight,
+      cap = body.cap.getOrElse(0),
+      allocationType = db.model.Goal
+    )
+    Await.result(fut, Duration.Inf).flatMap(_.toGoal).get
+  }
+
+  override def updateBudget(budgetId: Int, body: BudgetBody): Budget = {
+    val fut = queries.updateAllocation(budgetId,
+      name = body.name,
+      saved = body.saved,
+      weight = body.amount,
+      cap = body.cap.getOrElse(0),
+      allocationType = db.model.Budget
+    )
+    Await.result(fut, Duration.Inf).flatMap(_.toBudget).get
   }
 
   private implicit class AllocationConverter(allocation: db.model.Allocation) {
