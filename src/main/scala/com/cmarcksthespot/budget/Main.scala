@@ -1,18 +1,22 @@
 package com.cmarcksthespot.budget
 
 import com.cmarcksthespot.budget.api.{DefaultApiImpl, DefaultApiRouter}
+import com.cmarcksthespot.budget.db.Setup
 import com.netflix.hystrix.contrib.rxnetty.metricsstream.HystrixMetricsStreamHandler
 import io.netty.buffer.ByteBuf
 import io.netty.handler.codec.http.HttpResponseStatus
 import io.reactivex.netty.RxNetty
 import io.reactivex.netty.protocol.http.server.{ErrorResponseGenerator, HttpServer, HttpServerResponse, RequestHandler}
-
 import slick.driver.MySQLDriver.api.Database
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 object Main {
 
   def appSetup() = {
     val db = Database.forConfig("db.default")
+    Await.ready(Setup(db).createTables(), Duration.Inf)
 
     (DefaultApiRouter.createService(new DefaultApiImpl()), { () => db.close() })
   }
