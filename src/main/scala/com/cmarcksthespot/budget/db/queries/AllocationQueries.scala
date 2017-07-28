@@ -1,6 +1,6 @@
 package com.cmarcksthespot.budget.db.queries
 
-import com.cmarcksthespot.budget.db.model.{Allocation, AllocationType, Allocations}
+import com.cmarcksthespot.budget.db.model.{Allocation, AllocationType, Allocations, Budget}
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.meta.MTable
 import slick.lifted.TableQuery
@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 
 trait AllocationQueries {
-  def createTable(): Future[Unit]
+  def setup(): Future[Unit]
 
   def getAllocations(allocationType: AllocationType): Future[Seq[Allocation]]
 
@@ -25,7 +25,13 @@ object AllocationQueries {
 private[db] class AllocationQueriesImpl(db: Database) extends AllocationQueries {
   private val allocations: TableQuery[Allocations] = TableQuery[Allocations]
 
-  override def createTable(): Future[Unit] = {
+  override def setup(): Future[Unit] = {
+    for {
+      _ <- createTable()
+      _ <- createAllocation("uncategorized", 0, 0, 0, Budget)
+    } yield ()
+  }
+  private def createTable(): Future[Unit] = {
     db.run(MTable.getTables).flatMap { existingTables =>
       val existingTableNames = existingTables.map(t => t.name.name)
       if (!existingTableNames.contains(allocations.baseTableRow.tableName)) {
@@ -35,6 +41,7 @@ private[db] class AllocationQueriesImpl(db: Database) extends AllocationQueries 
         Future.successful(())
       }
     }
+
   }
 
   override def getAllocations(allocationType: AllocationType): Future[Seq[Allocation]] = {

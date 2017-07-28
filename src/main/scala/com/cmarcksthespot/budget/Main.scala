@@ -19,8 +19,7 @@ object Main {
   def appSetup() = {
     val db = Database.forConfig("db.default")
     val setup = Setup(db)
-    Await.result(setup.createTables(), Duration.Inf)
-    Await.ready(setup.mockData(), Duration.Inf)
+    Await.result(setup.run(), Duration.Inf)
 
     val allocationBusiness = AllocationBusiness(AllocationQueries(db))
     val transactionBusiness = TransactionBusiness(TransactionQueries(db))

@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait AccountQueries {
-  def createTable(): Future[Unit]
+  def setup(): Future[Unit]
 }
 object AccountQueries {
   def apply(db: Database) = new AccountQueriesImpl(db)
@@ -18,7 +18,7 @@ object AccountQueries {
 private[db] class AccountQueriesImpl(db: Database) extends AccountQueries {
   private val accounts: TableQuery[Accounts] = TableQuery[Accounts]
 
-  override def createTable(): Future[Unit] = {
+  override def setup(): Future[Unit] = {
     db.run(MTable.getTables).flatMap { existingTables =>
       val existingTableNames = existingTables.map(t => t.name.name)
       if (!existingTableNames.contains(accounts.baseTableRow.tableName)) {

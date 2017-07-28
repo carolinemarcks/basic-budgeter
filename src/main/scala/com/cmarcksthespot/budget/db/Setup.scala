@@ -7,8 +7,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait Setup {
-  def createTables(): Future[Unit]
-  def mockData(): Future[Unit]
+  def run(): Future[Unit]
 }
 
 object Setup {
@@ -29,18 +28,11 @@ private[db] trait SetupDep {
 private[db] trait SetupImpl extends Setup {
   self: SetupDep =>
 
-  override def createTables(): Future[Unit] = {
+  override def run(): Future[Unit] = {
     for {
-      _ <- accountsQueries.createTable()
-      _ <- allocationQueries.createTable()
-      _ <- transactionQueries.createTable()
-    } yield ()
-  }
-
-  override def mockData(): Future[Unit] = {
-    for {
-      _ <- allocationQueries.createAllocation("budget", 1, 1, 1, model.Budget)
-      _ <- allocationQueries.createAllocation("goal", 1, 1, 1, model.Goal)
+      _ <- accountsQueries.setup()
+      _ <- allocationQueries.setup()
+      _ <- transactionQueries.setup()
     } yield ()
   }
 }
