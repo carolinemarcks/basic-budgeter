@@ -30,3 +30,10 @@ libraryDependencies ++= Seq(
   "org.json4s" %% "json4s-native" % "3.4.0",
   "com.meetup" %% "json4s-java-time" % "0.0.9"
 )
+
+libraryDependencies ++= Seq(
+  "com.typesafe.slick" %% "slick" % "3.1.1",
+  "com.typesafe.slick" %% "slick-hikaricp" % "3.1.1",
+  "mysql" % "mysql-connector-java" % "5.1.27",
+  "org.slf4j" % "slf4j-nop" % "1.7.10"
+)

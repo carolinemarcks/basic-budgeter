@@ -7,10 +7,18 @@ import io.netty.handler.codec.http.HttpResponseStatus
 import io.reactivex.netty.RxNetty
 import io.reactivex.netty.protocol.http.server.{ErrorResponseGenerator, HttpServer, HttpServerResponse, RequestHandler}
 
+import slick.driver.MySQLDriver.api.Database
+
 object Main {
 
+  def appSetup() = {
+    val db = Database.forConfig("db.default")
+
+    (DefaultApiRouter.createService(new DefaultApiImpl()), { () => db.close() })
+  }
+
   final def main(args: Array[String]): Unit = {
-    val service = DefaultApiRouter.createService(new DefaultApiImpl())
+    val (service, onShutdown) = appSetup()
 
     /* Initialize the application and server. */
     println("Server is starting up")
@@ -20,6 +28,8 @@ object Main {
 
     /* Construct a sane shutdown procedure for the server and service. */
     val doShutdown: () => Unit = () => {
+      println("Application is shutting down")
+      onShutdown()
       println("Server is shutting down")
       server.shutdown()
       /* We call this here to make sure the server has terminated (no new
