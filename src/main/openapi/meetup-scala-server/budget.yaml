@@ -8,6 +8,7 @@ info:
   version: "1.0.0"
   title: money manager
 
+
 definitions:
   Status:
     description: a simple service status
@@ -16,6 +17,48 @@ definitions:
     properties:
       status:
         type: string
+  Goal:
+    required:
+      - id
+      - name
+      - saved
+      - weight
+    properties:
+      id:
+        type: integer
+        format: int32
+      name:
+        type: string
+      saved:
+        type: integer
+        format: int32
+      weight:
+        type: integer
+        format: int32
+      cap:
+        type: integer
+        format: int32
+  Budget:
+    required:
+      - id
+      - name
+      - saved
+      - amount
+    properties:
+      id:
+        type: integer
+        format: int32
+      name:
+        type: string
+      saved:
+        type: integer
+        format: int32
+      amount:
+        type: integer
+        format: int32
+      cap:
+        type: integer
+        format: int32
 
 paths:
   /ping:
@@ -27,3 +70,23 @@ paths:
           description: response indicating server is up
           schema:
             $ref: "#/definitions/Status"
+  /allocations/budgets:
+    get:
+      description: get a list of all budgets
+      operationId: getBudgets
+      responses:
+        200:
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Budget"
+  /allocations/goals:
+    get:
+      description: get a list of all goals
+      operationId: getGoals
+      responses:
+        200:
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Goal"
