@@ -17,6 +17,43 @@ definitions:
     properties:
       status:
         type: string
+  Transaction:
+    description: a single event involving money
+    required:
+      - id
+      - postedDate
+      - payee
+      - amount
+      - note
+      - allocationId
+    properties:
+      id:
+        type: string
+      postedDate:
+        type: string
+        format: timestamp
+      payee:
+        type: string
+      amount:
+        type: integer
+        format: int32
+      note:
+        type: string
+      allocationId:
+        description: the id of the goal or budget this transaction is associated with
+        type: integer
+        format: int32
+  PagedTransactions:
+    description: a page of transactions
+    required:
+      - transactions
+    properties:
+      transactions:
+        type: array
+        items:
+          $ref: "#/definitions/Transaction"
+      prev:
+        type: string
   Goal:
     required:
       - id
@@ -195,3 +232,25 @@ paths:
           description: updated goal
           schema:
             $ref: "#/definitions/Goal"
+  /transactions:
+    get:
+      description: get all transactions
+      operationId: getTransactions
+      parameters:
+      - in: query
+        name: page
+        description: info on requested page.  supplied by PagedTransactions/prev. if not supplied, starts at first page
+        type: string
+      - in: query
+        name: allocationFilter
+        type: integer
+        format: int32
+      - in: query
+        name: payeeFilter
+        type: string
+      responses:
+        200:
+          description: all transactions
+          schema:
+            $ref: "#/definitions/PagedTransactions"
+

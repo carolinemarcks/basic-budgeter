@@ -1,9 +1,10 @@
 package com.cmarcksthespot.budget.api
 
-import com.cmarcksthespot.budget.business.AllocationBusiness
+import com.cmarcksthespot.budget.business.{AllocationBusiness, TransactionBusiness}
 import com.cmarcksthespot.budget.model._
 
-class DefaultApiImpl(allocationBusiness: AllocationBusiness) extends DefaultApi {
+class DefaultApiImpl(allocationBusiness: AllocationBusiness,
+                     transactionBusiness: TransactionBusiness) extends DefaultApi {
   /**
     * ping
     *
@@ -65,4 +66,16 @@ class DefaultApiImpl(allocationBusiness: AllocationBusiness) extends DefaultApi 
     * @param body
     */
   override def updateBudget(budgetId: Int, body: BudgetBody): Budget = allocationBusiness.updateBudget(budgetId, body)
+
+  /**
+    * getTransactions
+    *
+    * get all transactions
+    *
+    * @param page info on requested page.  supplied by PagedTransactions/prev. if not supplied, starts at first page
+    * @param allocationFilter
+    * @param payeeFilter
+    */
+  override def getTransactions(page: Option[String], allocationFilter: Option[Int], payeeFilter: Option[String]): PagedTransactions =
+    transactionBusiness.getTransactions(page, allocationFilter, payeeFilter)
 }

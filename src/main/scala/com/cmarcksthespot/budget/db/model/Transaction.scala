@@ -5,7 +5,7 @@ import java.sql.Date
 import slick.driver.MySQLDriver.api._
 import slick.lifted.ProvenShape
 
-case class Transaction(id: String, accountId: Int, postedDate: Date, payee: String, address: String, centsAmount: Int, note: String, allocationId: Int)
+case class Transaction(id: String, accountId: Int, postedDate: Date, payee: String, address: String, amount: Int, note: String, allocationId: Int)
 
 private[db] class Transactions(tag: Tag)
       extends Table[Transaction](tag, "transactions") {
@@ -19,7 +19,7 @@ private[db] class Transactions(tag: Tag)
 
   def address: Rep[String] = column[String]("address")
 
-  def centsAmount: Rep[Int] = column[Int]("cents_amount")
+  def amount: Rep[Int] = column[Int]("amount")
 
   def note: Rep[String] = column[String]("note")
 
@@ -32,5 +32,5 @@ private[db] class Transactions(tag: Tag)
     foreignKey("allocation_fk", allocationId, TableQuery[Allocations])(_.id)
 
   def * : ProvenShape[Transaction] =
-    (id, accountId, postedDate, payee, address, centsAmount, note, allocationId) <>(Transaction.tupled, Transaction.unapply)
+    (id, accountId, postedDate, payee, address, amount, note, allocationId) <>(Transaction.tupled, Transaction.unapply)
 }

@@ -1,9 +1,9 @@
 package com.cmarcksthespot.budget
 
 import com.cmarcksthespot.budget.api.{DefaultApiImpl, DefaultApiRouter}
-import com.cmarcksthespot.budget.business.AllocationBusiness
+import com.cmarcksthespot.budget.business.{AllocationBusiness, TransactionBusiness}
 import com.cmarcksthespot.budget.db.Setup
-import com.cmarcksthespot.budget.db.queries.AllocationQueries
+import com.cmarcksthespot.budget.db.queries.{AllocationQueries, TransactionQueries}
 import com.netflix.hystrix.contrib.rxnetty.metricsstream.HystrixMetricsStreamHandler
 import io.netty.buffer.ByteBuf
 import io.netty.handler.codec.http.HttpResponseStatus
@@ -23,8 +23,9 @@ object Main {
     Await.ready(setup.mockData(), Duration.Inf)
 
     val allocationBusiness = AllocationBusiness(AllocationQueries(db))
+    val transactionBusiness = TransactionBusiness(TransactionQueries(db))
 
-    (DefaultApiRouter.createService(new DefaultApiImpl(allocationBusiness)), { () => db.close() })
+    (DefaultApiRouter.createService(new DefaultApiImpl(allocationBusiness, transactionBusiness)), { () => db.close() })
   }
 
   final def main(args: Array[String]): Unit = {
