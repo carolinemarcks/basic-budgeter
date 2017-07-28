@@ -51,10 +51,11 @@ object Main {
   }
 
   def mkServer(port: Int, handler: RequestHandler[ByteBuf, ByteBuf]) = {
+    val webappHandler = new WebappHandler(handler)
 
     /* Wrap the handler in a HystrixMetricsStreamHandler to give us Hystrix
        metrics reporting. */
-    val metricsHandler = new HystrixMetricsStreamHandler(handler)
+    val metricsHandler = new HystrixMetricsStreamHandler(webappHandler)
     val loggingHandler = new RequestLoggingHandler(metricsHandler)
 
     val server: HttpServer[ByteBuf, ByteBuf] =
