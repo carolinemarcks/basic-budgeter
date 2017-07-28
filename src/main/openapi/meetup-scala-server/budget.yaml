@@ -1,0 +1,29 @@
+swagger: "2.0"
+
+host: "localhost:9000"
+
+schemes: [ http ]
+
+info:
+  version: "1.0.0"
+  title: money manager
+
+definitions:
+  Status:
+    description: a simple service status
+    required:
+      - status
+    properties:
+      status:
+        type: string
+
+paths:
+  /ping:
+    get:
+      description: ping server to check if it's up
+      operationId: ping
+      responses:
+        200:
+          description: response indicating server is up
+          schema:
+            $ref: "#/definitions/Status"
