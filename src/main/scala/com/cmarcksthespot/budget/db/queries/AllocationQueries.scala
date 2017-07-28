@@ -12,7 +12,7 @@ import scala.concurrent.Future
 trait AllocationQueries {
   def createTable(): Future[Unit]
 
-  def getAllocations(): Future[Seq[Allocation]]
+  def getAllocations(allocationType: AllocationType): Future[Seq[Allocation]]
 
   def createAllocation(name: String, saved: Int, weight: Int, cap: Int, allocationType: AllocationType): Future[Allocation]
 
@@ -37,8 +37,8 @@ private[db] class AllocationQueriesImpl(db: Database) extends AllocationQueries 
     }
   }
 
-  override def getAllocations(): Future[Seq[Allocation]] = {
-    db.run(allocations.result)
+  override def getAllocations(allocationType: AllocationType): Future[Seq[Allocation]] = {
+    db.run(allocations.filter(_.allocationType === allocationType.id.bind).result)
   }
 
   private val allocationInsertQuery = allocations returning (allocations.map(_.id)) into ((row, id) => row.copy(id = id))

@@ -38,6 +38,8 @@ private[db] class Allocations(tag: Tag)
 
   def allocationType: Rep[Int] = column[Int]("allocation_type")
 
+  def idx = index("idx_alloc_type", allocationType, unique = false)
+
   def * : ProvenShape[Allocation] =
     (id, name, saved, weight, cap, allocationType) <> (AllocationExtraction.tupled, AllocationExtraction.unapply)
 }
