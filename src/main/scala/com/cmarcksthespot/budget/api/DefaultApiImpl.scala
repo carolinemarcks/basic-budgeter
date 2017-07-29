@@ -1,9 +1,10 @@
 package com.cmarcksthespot.budget.api
 
-import com.cmarcksthespot.budget.business.{AllocationBusiness, TransactionBusiness}
+import com.cmarcksthespot.budget.business.{AccountBusiness, AllocationBusiness, TransactionBusiness}
 import com.cmarcksthespot.budget.model._
 
-class DefaultApiImpl(allocationBusiness: AllocationBusiness,
+class DefaultApiImpl(accountBusiness: AccountBusiness,
+                     allocationBusiness: AllocationBusiness,
                      transactionBusiness: TransactionBusiness) extends DefaultApi {
   /**
     * ping
@@ -88,4 +89,13 @@ class DefaultApiImpl(allocationBusiness: AllocationBusiness,
     */
   override def allocate(body: Allocate): Transaction =
     transactionBusiness.allocate(body)
+
+  /**
+    * getAccounts
+    *
+    * get list of accounts
+    *
+    */
+  override def getAccounts(): List[Account] =
+    accountBusiness.getAccounts()
 }

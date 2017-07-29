@@ -1,7 +1,7 @@
 package com.cmarcksthespot.budget
 
 import com.cmarcksthespot.budget.api.{DefaultApiImpl, DefaultApiRouter}
-import com.cmarcksthespot.budget.business.{AllocationBusiness, TransactionBusiness}
+import com.cmarcksthespot.budget.business.{AccountBusiness, AllocationBusiness, TransactionBusiness}
 import com.cmarcksthespot.budget.db.queries.{AccountQueries, AllocationQueries, TransactionQueries}
 import com.netflix.hystrix.contrib.rxnetty.metricsstream.HystrixMetricsStreamHandler
 import io.netty.buffer.ByteBuf
@@ -19,19 +19,19 @@ object Main {
   def appSetup() = {
     val db = Database.forConfig("db.default")
 
-    val accountQueries = AccountQueries(db) // eventually this should be account business
+    val accountBusiness = AccountBusiness(AccountQueries(db))
     val allocationBusiness = AllocationBusiness(AllocationQueries(db))
     val transactionBusiness = TransactionBusiness(TransactionQueries(db))
 
     val setup = for {
-      _ <- accountQueries.setup()
+      _ <- accountBusiness.setup()
       _ <- allocationBusiness.setup()
       _ <- transactionBusiness.setup()
     } yield ()
     Await.result(setup, Duration.Inf)
 
 
-    (DefaultApiRouter.createService(new DefaultApiImpl(allocationBusiness, transactionBusiness)), { () => db.close() })
+    (DefaultApiRouter.createService(new DefaultApiImpl(accountBusiness, allocationBusiness, transactionBusiness)), { () => db.close() })
   }
 
   final def main(args: Array[String]): Unit = {

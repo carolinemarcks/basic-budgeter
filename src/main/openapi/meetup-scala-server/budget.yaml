@@ -142,7 +142,16 @@ definitions:
       cap:
         type: integer
         format: int32
-
+  Account:
+    required:
+      - name
+      - balance
+    properties:
+      name:
+        type: string
+      balance:
+        type: integer
+        format: int32
 
 paths:
   /ping:
@@ -154,6 +163,17 @@ paths:
           description: response indicating server is up
           schema:
             $ref: "#/definitions/Status"
+  /accounts:
+    get:
+      description: get list of accounts
+      operationId: getAccounts
+      responses:
+        200:
+          description: list of accounts
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Account"
   /allocations/budgets:
     post:
       description: create new budget

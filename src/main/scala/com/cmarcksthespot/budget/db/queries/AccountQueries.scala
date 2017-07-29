@@ -1,6 +1,6 @@
 package com.cmarcksthespot.budget.db.queries
 
-import com.cmarcksthespot.budget.db.model.Accounts
+import com.cmarcksthespot.budget.db.model.{Account, Accounts}
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.meta.MTable
 import slick.lifted.TableQuery
@@ -9,7 +9,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait AccountQueries {
-  def setup(): Future[Unit]
+  def createTable(): Future[Unit]
+
+  def getAccounts(): Future[Seq[Account]]
 }
 object AccountQueries {
   def apply(db: Database) = new AccountQueriesImpl(db)
@@ -18,7 +20,7 @@ object AccountQueries {
 private[db] class AccountQueriesImpl(db: Database) extends AccountQueries {
   private val accounts: TableQuery[Accounts] = TableQuery[Accounts]
 
-  override def setup(): Future[Unit] = {
+  override def createTable(): Future[Unit] = {
     db.run(MTable.getTables).flatMap { existingTables =>
       val existingTableNames = existingTables.map(t => t.name.name)
       if (!existingTableNames.contains(accounts.baseTableRow.tableName)) {
@@ -29,4 +31,7 @@ private[db] class AccountQueriesImpl(db: Database) extends AccountQueries {
       }
     }
   }
+
+  override def getAccounts(): Future[Seq[Account]] =
+    db.run(accounts.result)
 }
