@@ -33,6 +33,8 @@ trait AllocationBusiness {
 
   def isIncome(budget: Budget): Boolean
 
+  def getIncomeId(): Future[Int]
+
   def isUncategorized(budget: Budget): Boolean
 }
 
@@ -127,18 +129,22 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
   }
 
   override def getBalanceable(): Future[(List[Goal], List[Budget])] = {
-    queries.getAllocations(Set(UNCATEGORIZED)).map { allocs =>
+    queries.getAllocationsExcept(Set(UNCATEGORIZED)).map { allocs =>
       (allocs.flatMap(_.toGoal).toList, allocs.flatMap(_.toBudget).toList)
     }
   }
 
   override def getAll(): Future[(List[Goal], List[Budget])] = {
-    queries.getAllocations(Set.empty[String]).map { allocs =>
+    queries.getAllocationsExcept(Set.empty[String]).map { allocs =>
       (allocs.flatMap(_.toGoal).toList, allocs.flatMap(_.toBudget).toList)
     }
   }
 
   override def isIncome(budget: Budget): Boolean = budget.name == INCOME
+
+  override def getIncomeId(): Future[Int] = {
+    queries.getAllocations(Set(INCOME)).map(_.head.id)
+  }
 
   override def isUncategorized(budget: Budget): Boolean = budget.name == UNCATEGORIZED
 

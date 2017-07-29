@@ -17,6 +17,8 @@ trait TransactionBusiness {
 
   def distributeIncome(): Unit
 
+  def getHistory(): List[Month]
+
   def setup(): Future[Unit]
 }
 
@@ -152,6 +154,37 @@ private[business] class TransactionBusinessImpl(accountBusiness: AccountBusiness
       (goals, budgets) <- allocationBusiness.getAll()
       _ <- distributeIncome(goals, budgets)
     } yield ()
+    Await.result(fut, Duration.Inf)
+  }
+
+  override def getHistory(): List[Month] = {
+    val accounts = accountBusiness.getAccounts()
+    val netWorth = accounts.map(_.balance).sum
+
+    //TODO don't hardcode month year, auto calculate it based on curdate
+    val fut = for {
+      incomeId <- allocationBusiness.getIncomeId()
+      all <- queries.transactionsByMonthYear(0, 2017, None)
+      incomeOnly <- queries.transactionsByMonthYear(0, 2017, Some(incomeId))
+    } yield {
+      val incomeByMonthYear: Map[(Int, Int), Int] = incomeOnly.toMap
+      all
+        .sortBy { case ((month, year), _) => year * 12 + month }
+        .reverse
+        .foldLeft[(Int, List[Month])]((netWorth, Nil)) {
+        case ((newNetWorth, accum), ((month, year), transactionSum)) =>
+          val monthlyIncome = incomeByMonthYear.get((month, year)).getOrElse(0)
+          val monthSpending = monthlyIncome - transactionSum
+          val thisMonth = Month(
+            month = month,
+            year = year,
+            net = newNetWorth,
+            spent = monthSpending,
+            earned = monthlyIncome
+          )
+          (newNetWorth - transactionSum, thisMonth::accum)
+      }._2
+    }
     Await.result(fut, Duration.Inf)
   }
 }

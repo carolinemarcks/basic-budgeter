@@ -14,7 +14,9 @@ trait AllocationQueries {
 
   def getAllocations(allocationType: AllocationType): Future[Seq[Allocation]]
 
-  def getAllocations(exceptNames: Set[String]): Future[Seq[Allocation]]
+  def getAllocations(onlyNames: Set[String]): Future[Seq[Allocation]]
+
+  def getAllocationsExcept(exceptNames: Set[String]): Future[Seq[Allocation]]
 
   def createAllocation(name: String, saved: Int, weight: Int, cap: Int, allocationType: AllocationType): Future[Allocation]
 
@@ -41,7 +43,11 @@ private[db] class AllocationQueriesImpl(db: Database) extends AllocationQueries 
 
   }
 
-  override def getAllocations(exceptNames: Set[String]): Future[Seq[Allocation]] = {
+  override def getAllocations(onlyNames: Set[String]): Future[Seq[Allocation]] = {
+    db.run(allocations.filter(_.name inSet onlyNames).result)
+  }
+
+  override def getAllocationsExcept(exceptNames: Set[String]): Future[Seq[Allocation]] = {
     db.run(allocations.filterNot(_.name inSet exceptNames).result)
   }
 

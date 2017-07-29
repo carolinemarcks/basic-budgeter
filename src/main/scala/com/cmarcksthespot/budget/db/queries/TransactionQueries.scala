@@ -1,5 +1,7 @@
 package com.cmarcksthespot.budget.db.queries
 
+import java.sql.Date
+
 import com.cmarcksthespot.budget.db.model.{Transaction, Transactions}
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.meta.MTable
@@ -18,6 +20,8 @@ trait TransactionQueries {
   def getUnbalanced(): Future[List[Transaction]]
 
   def markBalanced(ids: Set[String]): Future[Int]
+
+  def transactionsByMonthYear(sinceMonth: Int, sinceYear: Int, allocationId: Option[Int]): Future[List[((Int, Int), Int)]]
 }
 
 object TransactionQueries {
@@ -84,5 +88,24 @@ private[db] class TransactionQueriesImpl(db: Database) extends TransactionQuerie
   override def markBalanced(ids: Set[String]): Future[Int] = {
     val query = transactions.filter(_.id inSet ids).map(_.isBalanced).update(true)
     db.run(query)
+  }
+
+  private val monthFn = SimpleFunction.unary[Date, Int]("month")
+  private val yearFn = SimpleFunction.unary[Date, Int]("year")
+
+  override def transactionsByMonthYear(sinceMonth: Int, sinceYear: Int, allocationId: Option[Int]): Future[List[((Int, Int), Int)]] = {
+    val baseQuery = allocationId
+      .map { aid => transactions.filter(_.allocationId === aid.bind ) }
+      .getOrElse(transactions)
+
+    val fullQuery = baseQuery.filter { t =>
+      monthFn(t.postedDate) >= sinceMonth && yearFn(t.postedDate) >= sinceYear
+    }.groupBy { t =>
+      (monthFn(t.postedDate), yearFn(t.postedDate))
+    }.map {
+      case (monthYear, transactions) => (monthYear, transactions.map(_.amount).sum)
+    }
+
+    db.run(fullQuery.result).map { _.map { case (monthYear, amount) => (monthYear, amount.getOrElse(0)) }.toList }
   }
 }

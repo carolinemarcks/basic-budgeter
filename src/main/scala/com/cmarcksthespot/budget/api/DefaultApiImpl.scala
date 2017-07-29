@@ -116,4 +116,13 @@ class DefaultApiImpl(accountBusiness: AccountBusiness,
     */
   override def distributeIncome(): Unit =
     transactionBusiness.distributeIncome()
+
+  /**
+    * getHistory
+    *
+    * get income history over the last six months
+    *
+    */
+  override def getHistory(): List[Month] =
+    transactionBusiness.getHistory()
 }

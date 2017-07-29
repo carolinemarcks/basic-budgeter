@@ -156,6 +156,29 @@ definitions:
       balance:
         type: integer
         format: int32
+  Month:
+    required:
+      - month
+      - year
+      - net
+      - spent
+      - earned
+    properties:
+      month:
+        type: integer
+        format: int32
+      year:
+        type: integer
+        format: int32
+      net:
+        type: integer
+        format: int32
+      spent:
+        type: integer
+        format: int32
+      earned:
+        type: integer
+        format: int32
 
 paths:
   /ping:
@@ -167,6 +190,17 @@ paths:
           description: response indicating server is up
           schema:
             $ref: "#/definitions/Status"
+  /history:
+    get:
+      description: get income history over the last six months
+      operationId: getHistory
+      responses:
+        200:
+          description: list of history by month
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Month"
   /accounts:
     get:
       description: get list of accounts
