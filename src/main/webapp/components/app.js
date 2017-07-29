@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import TransactionList from '../containers/transaction-list';
 import { fetchTransactions, fetchGoals, fetchBudgets } from '../actions';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 class App extends Component {
   componentDidMount() {
@@ -14,8 +15,15 @@ class App extends Component {
   render() {
     return (
       <div>
-      <h1>Budgeter</h1>
-      <TransactionList />
+        <h1>Budgeter</h1>
+        <Tabs>
+          <TabList>
+            <Tab>Transactions</Tab>
+          </TabList>
+          <TabPanel>
+            <TransactionList />
+          </TabPanel>
+        </Tabs>
       </div>
     );
   }
