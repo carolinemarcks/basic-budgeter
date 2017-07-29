@@ -4,8 +4,9 @@ import com.cmarcksthespot.budget.db
 import com.cmarcksthespot.budget.db.queries.AllocationQueries
 import com.cmarcksthespot.budget.model.{Budget, BudgetBody, Goal, GoalBody}
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AllocationBusiness {
   def createBudget(body: BudgetBody): Budget
@@ -19,13 +20,28 @@ trait AllocationBusiness {
   def updateBudget(budgetId: Int, body: BudgetBody): Budget
 
   def updateGoal(goalId: Int, body: GoalBody): Goal
+
+  def setup(): Future[Unit]
 }
 
 object AllocationBusiness {
+
   def apply(queries: AllocationQueries) = new AllocationBusinessImpl(queries)
 }
 
 private[business] class AllocationBusinessImpl(queries: AllocationQueries) extends AllocationBusiness {
+
+  private val UNCATEGORIZED = "uncategorized"
+  private val INCOME = "income"
+
+  override def setup(): Future[Unit] = {
+    for {
+      _ <- queries.createTable()
+      _ <- queries.createAllocation(UNCATEGORIZED, 0, 0, 0, db.model.Budget)
+      _ <- queries.createAllocation(INCOME, 0, 0, 0, db.model.Budget)
+    } yield ()
+  }
+
   override def getBudgets(): List[Budget] = {
     Await.result(queries.getAllocations(db.model.Budget), Duration.Inf).flatMap(_.toBudget).toList
   }
@@ -102,4 +118,5 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
       } else None
     }
   }
+
 }

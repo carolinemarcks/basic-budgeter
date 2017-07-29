@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait TransactionQueries {
-  def setup(): Future[Unit]
+  def createTable(): Future[Unit]
 
   def getTransactionPage(pageInfo: Option[(Long, Int)], allocationFilter: Option[Int], payeeFilter: Option[String], pageSize: Int): Future[Seq[Transaction]]
 
@@ -22,7 +22,7 @@ object TransactionQueries {
 private[db] class TransactionQueriesImpl(db: Database) extends TransactionQueries {
   private val transactions: TableQuery[Transactions] = TableQuery[Transactions]
 
-  override def setup(): Future[Unit] = {
+  override def createTable(): Future[Unit] = {
     db.run(MTable.getTables).flatMap { existingTables =>
       val existingTableNames = existingTables.map(t => t.name.name)
       if (!existingTableNames.contains(transactions.baseTableRow.tableName)) {

@@ -4,13 +4,15 @@ import com.cmarcksthespot.budget.db
 import com.cmarcksthespot.budget.db.queries.TransactionQueries
 import com.cmarcksthespot.budget.model.{Allocate, PagedTransactions, Transaction}
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
 trait TransactionBusiness {
   def getTransactions(page: Option[String], allocationFilter: Option[Int], payeeFilter: Option[String]): PagedTransactions
 
   def allocate(body: Allocate): Transaction
+
+  def setup(): Future[Unit]
 }
 
 object TransactionBusiness {
@@ -18,8 +20,12 @@ object TransactionBusiness {
 }
 
 private[business] class TransactionBusinessImpl(queries: TransactionQueries) extends TransactionBusiness {
-  val TRANSACTION_PAGE_SIZE = 20
 
+  override def setup(): Future[Unit] = {
+    queries.createTable()
+  }
+
+  val TRANSACTION_PAGE_SIZE = 20
   override def getTransactions(strPageInfo: Option[String], allocationFilter: Option[Int], payeeFilter: Option[String]): PagedTransactions = {
     val currPageInfo = strPageInfo.map(PageInfo.deserailize)
     val fut = queries.getTransactionPage(currPageInfo.map(PageInfo.unapply).flatten, allocationFilter, payeeFilter, TRANSACTION_PAGE_SIZE)
@@ -42,5 +48,4 @@ private[business] class TransactionBusinessImpl(queries: TransactionQueries) ext
       allocationId = t.allocationId
     )
   }
-
 }

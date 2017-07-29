@@ -2,8 +2,7 @@ package com.cmarcksthespot.budget
 
 import com.cmarcksthespot.budget.api.{DefaultApiImpl, DefaultApiRouter}
 import com.cmarcksthespot.budget.business.{AllocationBusiness, TransactionBusiness}
-import com.cmarcksthespot.budget.db.Setup
-import com.cmarcksthespot.budget.db.queries.{AllocationQueries, TransactionQueries}
+import com.cmarcksthespot.budget.db.queries.{AccountQueries, AllocationQueries, TransactionQueries}
 import com.netflix.hystrix.contrib.rxnetty.metricsstream.HystrixMetricsStreamHandler
 import io.netty.buffer.ByteBuf
 import io.netty.handler.codec.http.HttpResponseStatus
@@ -13,16 +12,24 @@ import slick.driver.MySQLDriver.api.Database
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Main {
 
   def appSetup() = {
     val db = Database.forConfig("db.default")
-    val setup = Setup(db)
-    Await.result(setup.run(), Duration.Inf)
 
+    val accountQueries = AccountQueries(db) // eventually this should be account business
     val allocationBusiness = AllocationBusiness(AllocationQueries(db))
     val transactionBusiness = TransactionBusiness(TransactionQueries(db))
+
+    val setup = for {
+      _ <- accountQueries.setup()
+      _ <- allocationBusiness.setup()
+      _ <- transactionBusiness.setup()
+    } yield ()
+    Await.result(setup, Duration.Inf)
+
 
     (DefaultApiRouter.createService(new DefaultApiImpl(allocationBusiness, transactionBusiness)), { () => db.close() })
   }
