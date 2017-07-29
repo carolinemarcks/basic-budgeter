@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import TransactionList from '../containers/transaction-list';
+import Budgets from '../containers/budgets';
 import { fetchTransactions, fetchGoals, fetchBudgets } from '../actions';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
@@ -19,9 +20,13 @@ class App extends Component {
         <Tabs>
           <TabList>
             <Tab>Transactions</Tab>
+            <Tab>Budgets</Tab>
           </TabList>
           <TabPanel>
             <TransactionList />
+          </TabPanel>
+          <TabPanel>
+            <Budgets />
           </TabPanel>
         </Tabs>
       </div>
