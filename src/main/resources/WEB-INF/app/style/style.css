@@ -50,3 +50,8 @@
   bottom: -5px;
   background: #fff;
 }
+
+.pagination {
+  float: right;
+  margin: 0;
+}

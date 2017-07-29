@@ -1,4 +1,5 @@
 import axios from 'axios';
+import _ from 'lodash';
 
 const ROOT_URL = 'http://localhost:9000';
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS';
@@ -8,8 +9,14 @@ export const ALLOCATE = 'ALLOCATE';
 export const CREATE_BUDGET = 'CREATE_BUDGET';
 export const CREATE_GOAL = 'CREATE_GOAL';
 
-export function fetchTransactions() {
-  const url = `${ROOT_URL}/transactions`;
+export function fetchTransactions(pageQuery) {
+  const base = `${ROOT_URL}/transactions`;
+
+  const params = _.filter([
+    !pageQuery ? '' : `page=${pageQuery}`
+  ], (p) => {return p} ).join('&');
+
+  const url = params? `${base}?${params}` : base
 
   const request = axios.get(url);
   return {

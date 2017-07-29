@@ -39,7 +39,7 @@ class TransactionRow extends Component {
         <td>{transaction.payee}</td>
         <td>{transaction.amount}</td>
         <td>{transaction.note}</td>
-        <td>{this.renderAllocations()}</td>
+        <td colSpan={2}>{this.renderAllocations()}</td>
       </tr>
     );
   }

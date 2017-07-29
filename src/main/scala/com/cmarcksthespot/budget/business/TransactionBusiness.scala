@@ -33,7 +33,7 @@ private[business] class TransactionBusinessImpl(accountBusiness: AccountBusiness
     queries.createTable()
   }
 
-  val TRANSACTION_PAGE_SIZE = 20
+  val TRANSACTION_PAGE_SIZE = 2
   override def getTransactions(strPageInfo: Option[String], allocationFilter: Option[Int], payeeFilter: Option[String]): PagedTransactions = {
     val currPageInfo = strPageInfo.map(PageInfo.deserailize)
     val fut = queries.getTransactionPage(currPageInfo.map(PageInfo.unapply).flatten, allocationFilter, payeeFilter, TRANSACTION_PAGE_SIZE)
@@ -46,7 +46,7 @@ private[business] class TransactionBusinessImpl(accountBusiness: AccountBusiness
     Await.result(queries.allocate(body.transactionId, body.allocationId), Duration.Inf).get.publicModel
   }
 
-  private implicit class TransactionConverter(t: db.model.Transaction) {
+  private implicit class TransactionConverter(t: db .model.Transaction) {
     def publicModel: Transaction = Transaction(
       id = t.id,
       postedDate = new java.util.Date(t.postedDate.getTime).toInstant,
