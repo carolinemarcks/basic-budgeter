@@ -107,4 +107,13 @@ class DefaultApiImpl(accountBusiness: AccountBusiness,
     */
   override def balance(): Unit =
     transactionBusiness.balance()
+
+  /**
+    * distributeIncome
+    *
+    * balance the \&quot;income\&quot; transactions
+    *
+    */
+  override def distributeIncome(): Unit =
+    transactionBusiness.distributeIncome()
 }

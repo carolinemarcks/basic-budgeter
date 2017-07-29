@@ -15,6 +15,8 @@ trait TransactionBusiness {
 
   def balance(): Unit
 
+  def distributeIncome(): Unit
+
   def setup(): Future[Unit]
 }
 
@@ -79,8 +81,8 @@ private[business] class TransactionBusinessImpl(accountBusiness: AccountBusiness
 
     for {
       _ <- queries.markBalanced(updatedTransactions.map(_.id).toSet)
-      _ <- updateGoals(updatedGoals)
-      _ <- updateBudgets(updatedBudgets)
+      _ <- updateGoals(updatedGoals.values)
+      _ <- updateBudgets(updatedBudgets.values)
       _ <- updateAccounts(updatedTransactions)
     } yield ()
   }
@@ -96,23 +98,60 @@ private[business] class TransactionBusinessImpl(accountBusiness: AccountBusiness
     }).map { _ => () }
   }
 
-  private def updateGoals(goals: Map[Int, Goal]): Future[Unit] = {
-    Future.sequence(goals.map { case (id, goal) =>
-      allocationBusiness.updateGoal(id, goal)
+  private def updateGoals(goals: Iterable[Goal]): Future[Unit] = {
+    Future.sequence(goals.map { goal =>
+      allocationBusiness.updateGoal(goal.id, goal)
     }).map {_ => ()}
   }
 
-  private def updateBudgets(budgets: Map[Int, Budget]): Future[Unit] = {
-    Future.sequence(budgets.map { case (id, budget) =>
-      allocationBusiness.updateBudget(id, budget)
+  private def updateBudgets(budgets: Iterable[Budget]): Future[Unit] = {
+    Future.sequence(budgets.map { budget =>
+      allocationBusiness.updateBudget(budget.id, budget)
     }).map {_ => ()}
   }
 
   override def balance(): Unit = {
-    for {
+    val fut = for {
       transactions <- queries.getUnbalanced()
       (goals, budgets) <- allocationBusiness.getBalanceable()
       _ <- balance(transactions, goals, budgets)
     } yield ()
+    Await.result(fut, Duration.Inf)
+  }
+
+  private def distributeIncome(goals: List[Goal], budgets: List[Budget]): Future[Unit] = {
+    val income = budgets.find(allocationBusiness.isIncome).get
+
+    val (budgetedAmt, newBudgets) = budgets.map { budget =>
+      val toAdd = Math.min(budget.amount, budget.cap.getOrElse(Int.MaxValue) - budget.saved)
+      (toAdd, budget.copy(saved = budget.saved + toAdd))
+    }.unzip
+
+    val newGoals = goals.foldLeft[(Int, Int, List[Goal])]((income.saved - budgetedAmt.sum, goals.map(_.weight).sum, Nil)) {
+      case ((amtLeft, stonesLeft, updatedGoals), goal) =>
+        val toAdd = Math.min(amtLeft * goal.weight / stonesLeft, goal.cap.getOrElse(Int.MaxValue) - goal.saved)
+        (amtLeft - toAdd, stonesLeft - goal.weight, goal.copy(saved = goal.saved + toAdd):: updatedGoals)
+    }._3
+
+    for {
+      _ <- updateBudgets(newBudgets)
+      _ <- updateGoals(newGoals)
+    } yield ()
+  }
+
+  private def bailIfUnbalanced(unbalanced: List[db.model.Transaction]): Future[Unit] = {
+    if (unbalanced.nonEmpty) {
+      throw new RuntimeException("cannot distribute income if there are unbalanced transactions")
+    } else Future.successful(())
+  }
+
+  override def distributeIncome(): Unit = {
+    val fut = for {
+      unbalanced <- queries.getUnbalanced()
+      _ <- bailIfUnbalanced(unbalanced)
+      (goals, budgets) <- allocationBusiness.getAll()
+      _ <- distributeIncome(goals, budgets)
+    } yield ()
+    Await.result(fut, Duration.Inf)
   }
 }

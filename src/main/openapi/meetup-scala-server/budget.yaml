@@ -285,12 +285,18 @@ paths:
             $ref: "#/definitions/Transaction"
   /balance:
     post:
-      description: balance all transactions that are not under the "uncategorized" or "income" budgets
+      description: balance all transactions that are not under the "uncategorized" budgets
       operationId: balance
       responses:
         204:
           description: balancing was successful
-
+  /income/distribute:
+    post:
+      description: balance the "income" transactions
+      operationId: distributeIncome
+      responses:
+        200:
+          description: balancing was successful
   /transactions:
     get:
       description: get all transactions
