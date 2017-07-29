@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import TransactionList from './transaction-list';
 import Budgets from './budgets';
 import Goals from './goals';
+import History from './history';
 import { fetchTransactions, fetchGoals, fetchBudgets } from '../actions';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
@@ -19,10 +20,14 @@ class App extends Component {
         <h1>Budgeter</h1>
         <Tabs>
           <TabList>
+            <Tab>Home</Tab>
             <Tab>Transactions</Tab>
             <Tab>Budgets</Tab>
             <Tab>Goals</Tab>
           </TabList>
+          <TabPanel>
+            <History />
+          </TabPanel>
           <TabPanel>
             <TransactionList />
           </TabPanel>

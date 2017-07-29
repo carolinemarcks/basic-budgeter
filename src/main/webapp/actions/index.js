@@ -8,6 +8,7 @@ export const FETCH_BUDGETS = 'FETCH_BUDGETS';
 export const ALLOCATE = 'ALLOCATE';
 export const CREATE_BUDGET = 'CREATE_BUDGET';
 export const CREATE_GOAL = 'CREATE_GOAL';
+export const FETCH_HISTORY = 'FETCH_HISTORY';
 
 export function fetchTransactions(pageQuery, filters = {}) {
   const base = `${ROOT_URL}/transactions`;
@@ -94,6 +95,15 @@ export function createGoal(goal) {
   const request = axios.post(url, res);
   return {
     type: CREATE_GOAL,
+    payload: request
+  };
+}
+
+export function fetchHistory() {
+  const url = `${ROOT_URL}/history`;
+  const request = axios.get(url);
+  return {
+    type: FETCH_HISTORY,
     payload: request
   };
 }
