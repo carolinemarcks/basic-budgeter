@@ -12,11 +12,12 @@ function getNewPages(statePages, data) {
     }
 }
 
-export default function(state = { pages: [''] }, action) {
+export default function(state = { pages: [''], filters: {} }, action) {
   switch (action.type) {
     case FETCH_TRANSACTIONS:
-      const newPages = getNewPages(state.pages, action.payload.data)
-      return { pages: newPages };
+      const basePages = _.isEqual(action.meta.filters, state.filters) ? state.pages : ['']
+      const newPages = getNewPages(basePages, action.payload.data)
+      return { pages: newPages, filters: action.meta.filters };
     default:
       return state;
     }

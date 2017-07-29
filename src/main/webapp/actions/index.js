@@ -9,11 +9,14 @@ export const ALLOCATE = 'ALLOCATE';
 export const CREATE_BUDGET = 'CREATE_BUDGET';
 export const CREATE_GOAL = 'CREATE_GOAL';
 
-export function fetchTransactions(pageQuery) {
+export function fetchTransactions(pageQuery, filters = {}) {
   const base = `${ROOT_URL}/transactions`;
+  const { allocationFilter, payeeFilter } = filters
 
   const params = _.filter([
-    !pageQuery ? '' : `page=${pageQuery}`
+    !pageQuery ? '' : `page=${pageQuery}`,
+    !allocationFilter ? '' : `allocationFilter=${allocationFilter}`,
+    !payeeFilter? '' : `payeeFilter=${payeeFilter}`
   ], (p) => {return p} ).join('&');
 
   const url = params? `${base}?${params}` : base
@@ -21,7 +24,8 @@ export function fetchTransactions(pageQuery) {
   const request = axios.get(url);
   return {
     type: FETCH_TRANSACTIONS,
-    payload: request
+    payload: request,
+    meta: { filters }
   };
 }
 export function fetchGoals() {
