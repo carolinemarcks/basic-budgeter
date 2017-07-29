@@ -43,6 +43,18 @@ definitions:
         description: the id of the goal or budget this transaction is associated with
         type: integer
         format: int32
+  Allocate:
+    description: an action marking a transaction as allocated to a specific goal or budget
+    required:
+      - transactionId
+      - allocationId
+    properties:
+      transactionId:
+        type: string
+      allocationId:
+        description: the id of the goal or budget this transaction should be allocated to
+        type: integer
+        format: int32
   PagedTransactions:
     description: a page of transactions
     required:
@@ -232,6 +244,21 @@ paths:
           description: updated goal
           schema:
             $ref: "#/definitions/Goal"
+  /allocate:
+    post:
+      description: allocation a transaction to a goal or a budget
+      operationId: allocate
+      parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          $ref: "#/definitions/Allocate"
+      responses:
+        200:
+          description: sucessfully allocated transaction
+          schema:
+            $ref: "#/definitions/Transaction"
   /transactions:
     get:
       description: get all transactions
@@ -253,4 +280,3 @@ paths:
           description: all transactions
           schema:
             $ref: "#/definitions/PagedTransactions"
-

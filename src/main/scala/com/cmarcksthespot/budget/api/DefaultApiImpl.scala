@@ -78,4 +78,14 @@ class DefaultApiImpl(allocationBusiness: AllocationBusiness,
     */
   override def getTransactions(page: Option[String], allocationFilter: Option[Int], payeeFilter: Option[String]): PagedTransactions =
     transactionBusiness.getTransactions(page, allocationFilter, payeeFilter)
+
+  /**
+    * allocate
+    *
+    * allocation a transaction to a goal or a budget
+    *
+    * @param body
+    */
+  override def allocate(body: Allocate): Transaction =
+    transactionBusiness.allocate(body)
 }

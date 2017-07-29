@@ -12,6 +12,8 @@ trait TransactionQueries {
   def setup(): Future[Unit]
 
   def getTransactionPage(pageInfo: Option[(Long, Int)], allocationFilter: Option[Int], payeeFilter: Option[String], pageSize: Int): Future[Seq[Transaction]]
+
+  def allocate(id: String, allocationId: Int): Future[Option[Transaction]]
 }
 object TransactionQueries {
   def apply(db: Database) = new TransactionQueriesImpl(db)
@@ -53,6 +55,21 @@ private[db] class TransactionQueriesImpl(db: Database) extends TransactionQuerie
     }
 
     db.run(payeeFilteredQuery.take(pageSize).result)
+  }
+
+  override def allocate(id: String, allocationId: Int): Future[Option[Transaction]] = {
+    val query = transactions.filter(_.id === id.bind).result.headOption.flatMap {
+      case None => DBIO.successful(None)
+      case Some(transaction) => updateTransaction(transaction.copy(allocationId = allocationId))
+    }
+    db.run(query)
+  }
+
+  private def updateTransaction(transaction: Transaction): DBIO[Option[Transaction]] = {
+    transactions.filter(_.id === transaction.id.bind).update(transaction).map {
+      case 0 => None
+      case _ => Some(transaction)
+    }
   }
 
 }

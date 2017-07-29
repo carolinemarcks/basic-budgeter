@@ -2,14 +2,17 @@ package com.cmarcksthespot.budget.business
 
 import com.cmarcksthespot.budget.db
 import com.cmarcksthespot.budget.db.queries.TransactionQueries
-import com.cmarcksthespot.budget.model.{PagedTransactions, Transaction}
+import com.cmarcksthespot.budget.model.{Allocate, PagedTransactions, Transaction}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 trait TransactionBusiness {
   def getTransactions(page: Option[String], allocationFilter: Option[Int], payeeFilter: Option[String]): PagedTransactions
+
+  def allocate(body: Allocate): Transaction
 }
+
 object TransactionBusiness {
   def apply(queries: TransactionQueries) = new TransactionBusinessImpl(queries)
 }
@@ -24,6 +27,11 @@ private[business] class TransactionBusinessImpl(queries: TransactionQueries) ext
     val prevPage = PageInfo.prevPage(transactions.map(_.postedDate.getTime), currPageInfo, TRANSACTION_PAGE_SIZE)
     PagedTransactions(transactions.map(_.publicModel), prevPage.map(_.toString))
   }
+
+  override def allocate(body: Allocate): Transaction = {
+    Await.result(queries.allocate(body.transactionId, body.allocationId), Duration.Inf).get.publicModel
+  }
+
   private implicit class TransactionConverter(t: db.model.Transaction) {
     def publicModel: Transaction = Transaction(
       id = t.id,
@@ -34,4 +42,5 @@ private[business] class TransactionBusinessImpl(queries: TransactionQueries) ext
       allocationId = t.allocationId
     )
   }
+
 }
