@@ -22,6 +22,8 @@ trait TransactionQueries {
   def markBalanced(ids: Set[String]): Future[Int]
 
   def transactionsByMonthYear(sinceMonth: Int, sinceYear: Int, allocationId: Option[Int]): Future[List[((Int, Int), Int)]]
+
+  def bulkInsertTransactions(rows: Iterable[Transaction]): Future[Option[Int]]
 }
 
 object TransactionQueries {
@@ -108,4 +110,7 @@ private[db] class TransactionQueriesImpl(db: Database) extends TransactionQuerie
 
     db.run(fullQuery.result).map { _.map { case (monthYear, amount) => (monthYear, amount.getOrElse(0)) }.toList }
   }
+
+  override def bulkInsertTransactions(rows: Iterable[Transaction]): Future[Option[Int]] =
+    db.run(transactions ++= rows)
 }

@@ -36,6 +36,8 @@ trait AllocationBusiness {
   def getIncomeId(): Future[Int]
 
   def isUncategorized(budget: Budget): Boolean
+
+  def getUncategorizedId(): Future[Int]
 }
 
 object AllocationBusiness {
@@ -147,6 +149,10 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
   }
 
   override def isUncategorized(budget: Budget): Boolean = budget.name == UNCATEGORIZED
+
+  override def getUncategorizedId(): Future[Int] = {
+    queries.getAllocations(Set(UNCATEGORIZED)).map(_.head.id)
+  }
 
   private implicit class AllocationConverter(allocation: db.model.Allocation) {
     def toBudget: Option[Budget] = {
