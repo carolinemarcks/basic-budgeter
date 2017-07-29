@@ -6,6 +6,7 @@ export const FETCH_GOALS = 'FETCH_GOALS';
 export const FETCH_BUDGETS = 'FETCH_BUDGETS';
 export const ALLOCATE = 'ALLOCATE';
 export const CREATE_BUDGET = 'CREATE_BUDGET';
+export const CREATE_GOAL = 'CREATE_GOAL';
 
 export function fetchTransactions() {
   const url = `${ROOT_URL}/transactions`;
@@ -63,6 +64,25 @@ export function createBudget(budget) {
   const request = axios.post(url, res);
   return {
     type: CREATE_BUDGET,
+    payload: request
+  };
+}
+
+export function createGoal(goal) {
+  const url = `${ROOT_URL}/allocations/goals`;
+  const res = {
+    name: goal['name'],
+    saved: parseInt(goal['saved']),
+    weight: parseInt(goal['weight'])
+  };
+
+  if (goal['cap']) {
+    res['cap'] = parseInt(goal['cap']);
+  }
+
+  const request = axios.post(url, res);
+  return {
+    type: CREATE_GOAL,
     payload: request
   };
 }
