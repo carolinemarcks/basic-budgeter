@@ -51,8 +51,8 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
   override def setup(): Future[Unit] = {
     for {
       _ <- queries.createTable()
-      _ <- queries.createAllocation(UNCATEGORIZED, 0, 0, 0, db.model.Budget)
-      _ <- queries.createAllocation(INCOME, 0, 0, 0, db.model.Budget)
+      _ <- queries.upsertAllocationByName(UNCATEGORIZED, 0, 0, 0, db.model.Budget)
+      _ <- queries.upsertAllocationByName(INCOME, 0, 0, 0, db.model.Budget)
     } yield ()
   }
 

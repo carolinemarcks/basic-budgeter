@@ -20,6 +20,8 @@ trait AllocationQueries {
 
   def createAllocation(name: String, saved: Int, weight: Int, cap: Int, allocationType: AllocationType): Future[Allocation]
 
+  def upsertAllocationByName(name: String, saved: Int, weight: Int, cap: Int, allocationType: AllocationType): Future[Int]
+
   def updateAllocation(id: Int, name: String, saved: Int, weight: Int, cap: Int, allocationType: AllocationType): Future[Option[Allocation]]
 }
 
@@ -56,9 +58,23 @@ private[db] class AllocationQueriesImpl(db: Database) extends AllocationQueries 
   }
 
   private val allocationInsertQuery = allocations returning (allocations.map(_.id)) into ((row, id) => row.copy(id = id))
-
   override def createAllocation(name: String, saved: Int, weight: Int, cap: Int, allocationType: AllocationType): Future[Allocation] = {
     db.run(allocationInsertQuery += Allocation(0, name, saved, weight, cap, allocationType))
+  }
+
+  def upsertAllocationByName(name: String, saved: Int, weight: Int, cap: Int, allocationType: AllocationType): Future[Int] = {
+    val newAllocation = Allocation(0, name, saved, weight, cap, allocationType)
+    val query = for {
+      rowsAfffected <- allocations
+        .filter(_.name === name.bind)
+        .map { a => (a.saved, a.weight, a.cap, a.allocationType) }
+        .update((saved, weight, cap, allocationType.id))
+      result <- rowsAfffected match {
+        case 0 => allocations += Allocation(0, name, saved, weight, cap, allocationType)
+        case n => DBIO.successful(n)
+      }
+    } yield result
+    db.run(query)
   }
 
   override def updateAllocation(id: Int, name: String, saved: Int, weight: Int, cap: Int, allocationType: AllocationType): Future[Option[Allocation]] = {
