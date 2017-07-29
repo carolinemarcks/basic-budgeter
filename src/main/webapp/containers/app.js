@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import TransactionList from '../containers/transaction-list';
-import Budgets from '../containers/budgets';
-import Goals from '../containers/goals';
+import TransactionList from './transaction-list';
+import Budgets from './budgets';
+import Goals from './goals';
 import { fetchTransactions, fetchGoals, fetchBudgets } from '../actions';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 class App extends Component {
   componentDidMount() {
-    //TODO eventually move these into their respective containers
     this.props.fetchTransactions();
     this.props.fetchBudgets();
     this.props.fetchGoals();
