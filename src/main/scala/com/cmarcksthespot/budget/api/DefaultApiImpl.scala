@@ -98,4 +98,13 @@ class DefaultApiImpl(accountBusiness: AccountBusiness,
     */
   override def getAccounts(): List[Account] =
     accountBusiness.getAccounts()
+
+  /**
+    * balance
+    *
+    * balance all transactions that are not under the \&quot;uncategorized\&quot; or \&quot;income\&quot; budgets
+    *
+    */
+  override def balance(): Unit =
+    transactionBusiness.balance()
 }

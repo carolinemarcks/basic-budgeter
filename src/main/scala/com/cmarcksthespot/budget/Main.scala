@@ -21,7 +21,7 @@ object Main {
 
     val accountBusiness = AccountBusiness(AccountQueries(db))
     val allocationBusiness = AllocationBusiness(AllocationQueries(db))
-    val transactionBusiness = TransactionBusiness(TransactionQueries(db))
+    val transactionBusiness = TransactionBusiness(accountBusiness, allocationBusiness, TransactionQueries(db))
 
     val setup = for {
       _ <- accountBusiness.setup()
@@ -31,7 +31,9 @@ object Main {
     Await.result(setup, Duration.Inf)
 
 
-    (DefaultApiRouter.createService(new DefaultApiImpl(accountBusiness, allocationBusiness, transactionBusiness)), { () => db.close() })
+    val apiImpl = new DefaultApiImpl(accountBusiness, allocationBusiness, transactionBusiness)
+
+    (DefaultApiRouter.createService(apiImpl), { () => db.close() })
   }
 
   final def main(args: Array[String]): Unit = {

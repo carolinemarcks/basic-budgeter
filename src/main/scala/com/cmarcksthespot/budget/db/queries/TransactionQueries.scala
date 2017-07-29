@@ -14,7 +14,12 @@ trait TransactionQueries {
   def getTransactionPage(pageInfo: Option[(Long, Int)], allocationFilter: Option[Int], payeeFilter: Option[String], pageSize: Int): Future[Seq[Transaction]]
 
   def allocate(id: String, allocationId: Int): Future[Option[Transaction]]
+
+  def getUnbalanced(): Future[List[Transaction]]
+
+  def markBalanced(ids: Set[String]): Future[Int]
 }
+
 object TransactionQueries {
   def apply(db: Database) = new TransactionQueriesImpl(db)
 }
@@ -72,4 +77,12 @@ private[db] class TransactionQueriesImpl(db: Database) extends TransactionQuerie
     }
   }
 
+  override def getUnbalanced(): Future[List[Transaction]] = {
+    db.run(transactions.filter(_.isBalanced).result).map(_.toList)
+  }
+
+  override def markBalanced(ids: Set[String]): Future[Int] = {
+    val query = transactions.filter(_.id inSet ids).map(_.isBalanced).update(true)
+    db.run(query)
+  }
 }

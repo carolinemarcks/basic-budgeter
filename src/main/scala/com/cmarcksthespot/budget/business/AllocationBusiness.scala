@@ -19,9 +19,15 @@ trait AllocationBusiness {
 
   def updateBudget(budgetId: Int, body: BudgetBody): Budget
 
+  def updateBudget(budgetId: Int, body: Budget): Future[Budget]
+
   def updateGoal(goalId: Int, body: GoalBody): Goal
 
+  def updateGoal(goalId: Int, body: Goal): Future[Goal]
+
   def setup(): Future[Unit]
+
+  def getBalanceable(): Future[(List[Goal], List[Budget])]
 }
 
 object AllocationBusiness {
@@ -72,6 +78,16 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
     Await.result(fut, Duration.Inf).toGoal.get
   }
 
+  override def updateGoal(goalId: Int, body: Goal): Future[Goal] = {
+    queries.updateAllocation(goalId,
+      name = body.name,
+      saved = body.saved,
+      weight = body.weight,
+      cap = body.cap.getOrElse(0),
+      allocationType = db.model.Goal
+    ).map { _.flatMap(_.toGoal).get }
+  }
+
   override def updateGoal(goalId: Int, body: GoalBody): Goal = {
     val fut = queries.updateAllocation(goalId,
       name = body.name,
@@ -83,15 +99,39 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
     Await.result(fut, Duration.Inf).flatMap(_.toGoal).get
   }
 
+  override def updateBudget(budgetId: Int, body: Budget): Future[Budget] = {
+    if (body.name == UNCATEGORIZED || body.name == INCOME) {
+      throw new RuntimeException("Cannot update uncategorized or income budget")
+    } else {
+      queries.updateAllocation(budgetId,
+        name = body.name,
+        saved = body.saved,
+        weight = body.amount,
+        cap = body.cap.getOrElse(0),
+        allocationType = db.model.Budget
+      ).map { _.flatMap(_.toBudget).get }
+    }
+  }
+
   override def updateBudget(budgetId: Int, body: BudgetBody): Budget = {
-    val fut = queries.updateAllocation(budgetId,
-      name = body.name,
-      saved = body.saved,
-      weight = body.amount,
-      cap = body.cap.getOrElse(0),
-      allocationType = db.model.Budget
-    )
-    Await.result(fut, Duration.Inf).flatMap(_.toBudget).get
+    if (body.name == UNCATEGORIZED || body.name == INCOME) {
+      throw new RuntimeException("Cannot update uncategorized or income budget")
+    } else {
+      val fut = queries.updateAllocation(budgetId,
+        name = body.name,
+        saved = body.saved,
+        weight = body.amount,
+        cap = body.cap.getOrElse(0),
+        allocationType = db.model.Budget
+      )
+      Await.result(fut, Duration.Inf).flatMap(_.toBudget).get
+    }
+  }
+
+  override def getBalanceable(): Future[(List[Goal], List[Budget])] = {
+    queries.getAllocations(Set(UNCATEGORIZED,INCOME)).map { allocs =>
+      (allocs.flatMap(_.toGoal).toList, allocs.flatMap(_.toBudget).toList)
+    }
   }
 
   private implicit class AllocationConverter(allocation: db.model.Allocation) {

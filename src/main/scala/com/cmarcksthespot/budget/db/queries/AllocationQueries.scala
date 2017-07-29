@@ -14,10 +14,13 @@ trait AllocationQueries {
 
   def getAllocations(allocationType: AllocationType): Future[Seq[Allocation]]
 
+  def getAllocations(exceptNames: Set[String]): Future[Seq[Allocation]]
+
   def createAllocation(name: String, saved: Int, weight: Int, cap: Int, allocationType: AllocationType): Future[Allocation]
 
   def updateAllocation(id: Int, name: String, saved: Int, weight: Int, cap: Int, allocationType: AllocationType): Future[Option[Allocation]]
 }
+
 object AllocationQueries {
   def apply(db: Database) = new AllocationQueriesImpl(db)
 }
@@ -36,6 +39,10 @@ private[db] class AllocationQueriesImpl(db: Database) extends AllocationQueries 
       }
     }
 
+  }
+
+  override def getAllocations(exceptNames: Set[String]): Future[Seq[Allocation]] = {
+    db.run(allocations.filterNot(_.name inSet exceptNames).result)
   }
 
   override def getAllocations(allocationType: AllocationType): Future[Seq[Allocation]] = {

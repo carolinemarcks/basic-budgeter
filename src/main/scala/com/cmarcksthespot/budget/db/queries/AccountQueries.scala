@@ -12,6 +12,8 @@ trait AccountQueries {
   def createTable(): Future[Unit]
 
   def getAccounts(): Future[Seq[Account]]
+
+  def updateBalance(id: Int, newBalance: Int): Future[Int]
 }
 object AccountQueries {
   def apply(db: Database) = new AccountQueriesImpl(db)
@@ -34,4 +36,9 @@ private[db] class AccountQueriesImpl(db: Database) extends AccountQueries {
 
   override def getAccounts(): Future[Seq[Account]] =
     db.run(accounts.result)
+
+  override def updateBalance(id: Int, newBalance: Int): Future[Int] = {
+    val query = accounts.filter(_.id === id.bind).map(_.balance).update(newBalance)
+    db.run(query)
+  }
 }

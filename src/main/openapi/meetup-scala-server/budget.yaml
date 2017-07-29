@@ -144,9 +144,13 @@ definitions:
         format: int32
   Account:
     required:
+      - id
       - name
       - balance
     properties:
+      id:
+        type: integer
+        format: int32
       name:
         type: string
       balance:
@@ -279,6 +283,14 @@ paths:
           description: sucessfully allocated transaction
           schema:
             $ref: "#/definitions/Transaction"
+  /balance:
+    post:
+      description: balance all transactions that are not under the "uncategorized" or "income" budgets
+      operationId: balance
+      responses:
+        204:
+          description: balancing was successful
+
   /transactions:
     get:
       description: get all transactions
