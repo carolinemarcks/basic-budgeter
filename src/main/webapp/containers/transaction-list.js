@@ -1,13 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { fetchTransactions } from '../actions';
 import TransactionRow from './transaction-row';
 
 class TransactionList extends Component {
-  componentDidMount() {
-    this.props.fetchTransactions();
-  }
   render() {
     return (
       <table className="table table-hover">
@@ -34,8 +29,4 @@ function mapStateToProps({ transactions }){
   return { transactions };
 }
 
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ fetchTransactions }, dispatch);
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(TransactionList);
+export default connect(mapStateToProps)(TransactionList);

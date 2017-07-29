@@ -1,8 +1,12 @@
 import { combineReducers } from 'redux';
-import TransactionList from './reducer-transactions';
+import Transactions from './reducer-transactions';
+import Goals from './reducer-goals';
+import Budgets from './reducer-budgets';
 
 const rootReducer = combineReducers({
-  transactions: TransactionList
+  transactions: Transactions,
+  goals: Goals,
+  budgets: Budgets
 });
 
 export default rootReducer;

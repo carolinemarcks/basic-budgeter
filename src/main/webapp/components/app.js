@@ -1,7 +1,16 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import TransactionList from '../containers/transaction-list';
+import { fetchTransactions, fetchGoals, fetchBudgets } from '../actions';
 
-export default class App extends Component {
+class App extends Component {
+  componentDidMount() {
+    //TODO eventually move these into their respective containers
+    this.props.fetchTransactions();
+    this.props.fetchBudgets();
+    this.props.fetchGoals();
+  }
   render() {
     return (
       <div>
@@ -11,3 +20,9 @@ export default class App extends Component {
     );
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({ fetchTransactions, fetchGoals, fetchBudgets }, dispatch);
+}
+
+export default connect(null, mapDispatchToProps)(App);
