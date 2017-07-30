@@ -5,6 +5,7 @@ import { fetchHistory } from '../actions';
 import _ from 'lodash';
 import NetWorth from './networth';
 import Deltas from './deltas';
+import Predictions from './predictions';
 import MonthProgress from './month-progress';
 import { ResponsiveContainer, ComposedChart, Bar, BarChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
@@ -12,7 +13,7 @@ import { ResponsiveContainer, ComposedChart, Bar, BarChart, Line,
 const monthNames = ["Jan", "Feb ", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
-class History extends Component {
+class Home extends Component {
   componentDidMount() {
     this.props.fetchHistory();
   }
@@ -20,21 +21,35 @@ class History extends Component {
   render() {
     return (
       <div>
-        <table className="history">
+        <table className="home-history">
           <tbody>
             <tr>
-              <td>
+              <td className="graph">
                 <h4>Net Worth Tracking</h4>
                 <NetWorth />
               </td>
-              <td>
+              <td className="graph">
                 <h4>Monthly Deltas</h4>
                 <Deltas />
               </td>
             </tr>
           </tbody>
         </table>
-        <MonthProgress />
+        <br/>
+        <table className="home-month">
+          <tbody>
+            <tr>
+              <td>
+                <h4>Current Budget Standings</h4>
+                <MonthProgress />
+              </td>
+              <td className="predictions">
+                <h4>Predictions</h4>
+                <Predictions />
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     );
   }
@@ -48,4 +63,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({ fetchHistory }, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(History);
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

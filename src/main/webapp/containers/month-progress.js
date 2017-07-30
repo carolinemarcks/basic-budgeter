@@ -70,15 +70,13 @@ class MonthProgress extends Component {
       }
     })), ({percent}) => { return percent });
     return (
-      <div>
-        <h4>Current Budget Standings</h4>
         <ResponsiveContainer width="100%" height={800}>
           <BarChart
             barSize={20}
             barCategoryGap="100%"
             data={data}
             layout="vertical"
-            margin={{top: 5, right: 50, left: 150, bottom: 5}}>
+            margin={{top: 5, right: 0, left:125, bottom: 5}}>
             <XAxis type="number" hide={true} tickLine={false} axisLine={false} tick={false} domain={['dataMin - 1', 110]}/>
             <YAxis type="category" dataKey="name" hide={true} tickLine={false} interval={0} />
             <ReferenceLine x={0} stroke="#404E4D" />
@@ -90,7 +88,6 @@ class MonthProgress extends Component {
             <Bar stackId="stack" dataKey="extraneg" fill="#61211f" label={<CustomizedLabel data={data} />} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
     );
   }
 }

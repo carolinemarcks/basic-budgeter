@@ -64,13 +64,23 @@
   width: auto;
 }
 
-table.history {
+table.home-history {
   table-layout: fixed;
   width: 100%;
 }
 
-table.history td {
+table.home-history td.graph {
   width: 50%;
+}
+
+table.home-month {
+  table-layout: fixed;
+  width: 100%;
+}
+
+table.home-month td.predictions {
+  width: 20%;
+  vertical-align: top;
 }
 
 table.allocations {
