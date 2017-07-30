@@ -172,8 +172,7 @@ private[business] class TransactionBusinessImpl(accountBusiness: AccountBusiness
     } yield {
       val incomeByMonthYear: Map[(Int, Int), Int] = incomeOnly.toMap
       all
-        .sortBy { case ((month, year), _) => year * 12 + month }
-        .reverse
+        .sortBy { case ((month, year), _) => - (year * 12 + month) }
         .foldLeft[(Int, List[Month])]((netWorth, Nil)) {
         case ((newNetWorth, accum), ((month, year), transactionSum)) =>
           val monthlyIncome = incomeByMonthYear.get((month, year)).getOrElse(0)

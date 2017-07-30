@@ -2,19 +2,31 @@ package com.cmarcksthespot.budget.business
 
 import java.util.Date
 
-import com.cmarcksthespot.budget.business.Parsers.{ParsedCSV, ParsedCents, ParsedSimpleDate}
+import com.cmarcksthespot.budget.business.Parsers.{ParseQuoted, ParsedCSV, ParsedCents, ParsedSimpleDate}
 
-case class BoaTransaction(postedDate: Date,
-                          referenceNumber: String, // too big to fit in an int or logn
-                          payee: String,
-                          address: String,
-                          centsAmount: Int)
+case class BoaCreditCardTransaction(postedDate: Date,
+                                    referenceNumber: String, // too big to fit in an int or logn
+                                    payee: String,
+                                    address: String,
+                                    centsAmount: Int)
+case class BoaAcctTransaction(postedDate: Date,
+                              description: String,
+                              centsAmount: Int)
 
 object BoaCsvParse {
-  def parse(sourceLines: Iterator[String]): Iterator[BoaTransaction] = {
+  def parseCreditCardLines(sourceLines: Iterator[String]): Iterator[BoaCreditCardTransaction] = {
     sourceLines.drop(1).map {
       case ParsedCSV(Array(ParsedSimpleDate(postedDate), refNumber, payee, address, ParsedCents(amount))) =>
-        BoaTransaction(postedDate, refNumber, clean(payee), clean(address), amount)
+        BoaCreditCardTransaction(postedDate, refNumber, clean(payee), clean(address), amount)
+    }
+  }
+
+  def parseAccountLines(sourceLines: Iterator[String]): Iterator[BoaAcctTransaction] = {
+    sourceLines.flatMap {
+      case ParsedCSV(Array(ParsedSimpleDate(postedDate), ParseQuoted(description), ParseQuoted(ParsedCents(amount)), ParseQuoted(ParsedCents(runningBal)))) =>
+        Some(BoaAcctTransaction(postedDate, clean(description), amount))
+      case l => println(s"couldn't parse line $l")
+        None
     }
   }
 

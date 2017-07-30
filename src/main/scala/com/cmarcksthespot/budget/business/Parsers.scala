@@ -34,12 +34,19 @@ object Parsers {
         case Array(ParsedInt(dollars), ParsedInt(cents)) =>
           val absDollars = Math.abs(dollars)
           val tot = absDollars * 100 + cents
-          if (absDollars == dollars) Some(tot)
+          if (ParsedDouble.unapply(arg).getOrElse(0.0) > 0.0) Some(tot)
           else Some(tot * -1)
         case _ => None
       }
     } catch {
       case e: NumberFormatException => None
+    }
+  }
+  object ParseQuoted {
+    def unapply(arg: String): Option[String] = {
+      if (arg.startsWith("\"") && arg.endsWith("\"")) {
+        Some(arg.substring(1, arg.length -1))
+      } else None
     }
   }
 
