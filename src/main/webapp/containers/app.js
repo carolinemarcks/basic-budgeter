@@ -27,6 +27,8 @@ class App extends Component {
             <Tab>Goals</Tab>
           </TabList>
           <TabPanel>
+            <History />
+            <br/>
             <MonthProgress />
           </TabPanel>
           <TabPanel>

@@ -70,24 +70,27 @@ class MonthProgress extends Component {
       }
     })), ({percent}) => { return percent });
     return (
-      <ResponsiveContainer width="100%" height={800}>
-      <BarChart
-        barSize={20}
-        barCategoryGap="100%"
-        data={data}
-        layout="vertical"
-        margin={{top: 5, right: 50, left: 150, bottom: 5}}>
-        <XAxis type="number" hide={true} tickLine={false} axisLine={false} tick={false} domain={['dataMin - 1', 110]}/>
-        <YAxis type="category" dataKey="name" hide={true} tickLine={false} interval={0} />
-        <ReferenceLine x={0} stroke="#404E4D" />
-        <ReferenceLine x={101} stroke="#404E4D" strokeDasharray="3 3" />
-        <Tooltip content={<CustomTooltip />}/>
-        <Bar stackId="stack" dataKey="posp" fill="#9BC53D" label={<CustomizedLabel data={data} />} />
-        <Bar stackId="stack" dataKey="negp" fill="#C3423F" label={<CustomizedLabel data={data} />} />
-        <Bar stackId="stack" dataKey="extrapos" fill="#6c892a" label={<CustomizedLabel data={data} />} />
-        <Bar stackId="stack" dataKey="extraneg" fill="#61211f" label={<CustomizedLabel data={data} />} />
-      </BarChart>
-      </ResponsiveContainer>
+      <div>
+        <h4>Current Budget Standings</h4>
+        <ResponsiveContainer width="100%" height={800}>
+          <BarChart
+            barSize={20}
+            barCategoryGap="100%"
+            data={data}
+            layout="vertical"
+            margin={{top: 5, right: 50, left: 150, bottom: 5}}>
+            <XAxis type="number" hide={true} tickLine={false} axisLine={false} tick={false} domain={['dataMin - 1', 110]}/>
+            <YAxis type="category" dataKey="name" hide={true} tickLine={false} interval={0} />
+            <ReferenceLine x={0} stroke="#404E4D" />
+            <ReferenceLine x={101} stroke="#404E4D" strokeDasharray="3 3" />
+            <Tooltip content={<CustomTooltip />}/>
+            <Bar stackId="stack" dataKey="posp" fill="#9BC53D" label={<CustomizedLabel data={data} />} />
+            <Bar stackId="stack" dataKey="negp" fill="#C3423F" label={<CustomizedLabel data={data} />} />
+            <Bar stackId="stack" dataKey="extrapos" fill="#6c892a" label={<CustomizedLabel data={data} />} />
+            <Bar stackId="stack" dataKey="extraneg" fill="#61211f" label={<CustomizedLabel data={data} />} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     );
   }
 }

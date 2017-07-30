@@ -29,7 +29,6 @@ class History extends Component {
          <YAxis orientation="left" stroke="#404E4D"/>
          <CartesianGrid strokeDasharray="3 3"/>
          <Tooltip/>
-         <Legend />
          <Bar stackId="stack" dataKey="net" fill="#20A4F3" />
         </BarChart>
       </ResponsiveContainer>
@@ -52,7 +51,6 @@ class History extends Component {
          <YAxis orientation="left" stroke="#404E4D"/>
          <CartesianGrid strokeDasharray="3 3"/>
          <Tooltip/>
-         <Legend />
          <Bar stackId="stack" dataKey="earned" fill="#9BC53D" />
          <Bar stackId="stack" dataKey="spent" fill="#C3423F" />
          <Line type="monotone" dataKey="delta" stroke="#404E4D" />
@@ -63,8 +61,14 @@ class History extends Component {
     return (<table className="history">
       <tbody>
         <tr>
-          <td>{this.renderNetWorth()}</td>
-          <td>{this.renderEarningSpendingDelta()}</td>
+          <td>
+            <h4>Net Worth Tracking</h4>
+            {this.renderNetWorth()}
+          </td>
+          <td>
+            <h4>Monthly Deltas</h4>
+            {this.renderEarningSpendingDelta()}
+          </td>
         </tr>
       </tbody>
     </table>);
