@@ -134,7 +134,7 @@ private[business] class TransactionBusinessImpl(accountBusiness: AccountBusiness
       (toAdd, budget.copy(saved = budget.saved + toAdd))
     }.unzip
 
-    val newGoals = goals.foldLeft[(Int, Int, List[Goal])]((income.saved - budgetedAmt.sum, goals.map(_.weight).sum, Nil)) {
+    val newGoals = goals.sortBy(g => (-g.weight, g.name)).foldLeft[(Int, Int, List[Goal])]((income.saved - budgetedAmt.sum, goals.map(_.weight).sum, Nil)) {
       case ((amtLeft, stonesLeft, updatedGoals), goal) =>
         val toAdd = Math.min(amtLeft * goal.weight / stonesLeft, goal.cap.getOrElse(Int.MaxValue) - goal.saved)
         (amtLeft - toAdd, stonesLeft - goal.weight, goal.copy(saved = goal.saved + toAdd):: updatedGoals)
