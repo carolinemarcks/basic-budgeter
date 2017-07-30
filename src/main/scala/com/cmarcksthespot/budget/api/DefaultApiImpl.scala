@@ -20,7 +20,11 @@ class DefaultApiImpl(accountBusiness: AccountBusiness,
     * get a list of all budgets
     *
     */
-  override def getBudgets(): List[Budget] = allocationBusiness.getBudgets()
+  override def getBudgets(): List[Budget] = {
+    allocationBusiness.getBudgets().map { allocation =>
+      allocation.copy(history = transactionBusiness.getHistory(allocation.id))
+    }
+  }
 
   /**
     * getGoals
@@ -28,7 +32,11 @@ class DefaultApiImpl(accountBusiness: AccountBusiness,
     * get a list of all goals
     *
     */
-  override def getGoals(): List[Goal] = allocationBusiness.getGoals()
+  override def getGoals(): List[Goal] = {
+    allocationBusiness.getGoals().map { allocation =>
+      allocation.copy(history = transactionBusiness.getHistory(allocation.id))
+    }
+  }
 
   /**
     * createBudget

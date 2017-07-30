@@ -19,6 +19,8 @@ trait TransactionBusiness {
 
   def getHistory(): List[Month]
 
+  def getHistory(allocationId: Int): List[AllocationMonth]
+
   def setup(): Future[Unit]
 
   //TODO business class should not talk in terms of db models
@@ -188,6 +190,16 @@ private[business] class TransactionBusinessImpl(accountBusiness: AccountBusiness
       }._2
     }
     Await.result(fut, Duration.Inf)
+  }
+
+
+  override def getHistory(allocationId: Int): List[AllocationMonth] = {
+    val byMonthYear = Await.result(queries.transactionsByMonthYear(0, 2017, Some(allocationId)), Duration.Inf).toMap
+    //TODO don't hardcode this
+    ((1,2017)::(2,2017)::(3,2017)::(4,2017)::(5, 2017)::(6, 2017)::Nil).map {
+      case my@(month, year) =>
+        AllocationMonth(month, year, -byMonthYear.get(my).getOrElse(0))
+    }
   }
 
   //TODO business class should not talk in terms of db models

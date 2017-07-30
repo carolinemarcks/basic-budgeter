@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts';
 
 export default class Allocations extends Component {
   constructor(props) {
@@ -30,8 +31,31 @@ export default class Allocations extends Component {
   renderRow(allocation) {
     return (<tr key={allocation.id}>
       {this.props.fields.map((f) => {return <td key={f}>{allocation[f]}</td>})}
-      <td></td>
+      <td>{this.renderChart(allocation)}</td>
     </tr>);
+  }
+  renderChart(allocation) {
+    const monthNames = ["Jan", "Feb ", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    const data = allocation.history.map(({ month, net }) => {
+      return {
+        month: monthNames[month - 1],
+        net: net / 100
+      }
+    });
+    const avg = _.reduce(data, function(sum, d) {
+      return sum + d.net;
+    }, 0) / data.length;
+    return (
+      <LineChart width={300} height={200} data={data}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <XAxis dataKey="month" />
+        <YAxis />
+        <Tooltip />
+        <ReferenceLine y={avg} stroke="#404E4D" strokeDasharray="3 3" />
+        <Line type="monotone" dataKey="net" stroke="#20A4F3" />
+      </LineChart>);
   }
   renderField(fieldName) {
     return (<td key={fieldName}><input

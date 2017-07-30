@@ -72,6 +72,7 @@ definitions:
       - name
       - saved
       - weight
+      - history
     properties:
       id:
         type: integer
@@ -87,6 +88,10 @@ definitions:
       cap:
         type: integer
         format: int32
+      history:
+        type: array
+        items:
+          $ref: "#/definitions/AllocationMonth"
   GoalBody:
     required:
       - name
@@ -110,6 +115,7 @@ definitions:
       - name
       - saved
       - amount
+      - history
     properties:
       id:
         type: integer
@@ -125,6 +131,10 @@ definitions:
       cap:
         type: integer
         format: int32
+      history:
+        type: array
+        items:
+          $ref: "#/definitions/AllocationMonth"
   BudgetBody:
     required:
       - name
@@ -154,6 +164,21 @@ definitions:
       name:
         type: string
       balance:
+        type: integer
+        format: int32
+  AllocationMonth:
+    required:
+      - month
+      - year
+      - net
+    properties:
+      month:
+        type: integer
+        format: int32
+      year:
+        type: integer
+        format: int32
+      net:
         type: integer
         format: int32
   Month:

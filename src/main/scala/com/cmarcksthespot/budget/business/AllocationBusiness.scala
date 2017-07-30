@@ -162,7 +162,8 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
           name = allocation.name,
           saved = allocation.saved,
           amount = allocation.weight,
-          cap = Some(allocation.cap).filterNot(_.equals(0))
+          cap = Some(allocation.cap).filterNot(_.equals(0)),
+          history = Nil //this gets added in the api layer
         ))
       } else None
     }
@@ -173,7 +174,8 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
           name = allocation.name,
           saved = allocation.saved,
           weight = allocation.weight,
-          cap = Some(allocation.cap).filterNot(_.equals(0))
+          cap = Some(allocation.cap).filterNot(_.equals(0)),
+          history = Nil //this gets added in the api layer
         ))
       } else None
     }
