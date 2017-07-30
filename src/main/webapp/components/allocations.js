@@ -30,7 +30,12 @@ export default class Allocations extends Component {
   }
   renderRow(allocation) {
     return (<tr key={allocation.id}>
-      {this.props.fields.map((f) => {return <td key={f}>{allocation[f]}</td>})}
+      {this.props.fields.map((f) => {
+        const alloc = allocation[f]
+        const shown = alloc && (f === "saved" || f === "amount" || f === "cap") ?
+          `$${(alloc/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')}` : alloc
+        return <td key={f}>{shown}</td>
+      })}
       <td>{this.renderChart(allocation)}</td>
     </tr>);
   }

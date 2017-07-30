@@ -37,7 +37,7 @@ class TransactionRow extends Component {
       <tr key={transaction.id}>
         <td>{moment(transaction.postedDate).format('L')}</td>
         <td>{transaction.payee}</td>
-        <td>{transaction.amount}</td>
+        <td>${(transaction.amount/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')}</td>
         <td>{transaction.note}</td>
         <td colSpan={2}>{this.renderAllocations()}</td>
       </tr>
