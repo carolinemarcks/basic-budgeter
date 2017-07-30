@@ -56,6 +56,14 @@
   margin: 0;
 }
 
+.container-custom {
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: auto;
+}
+
 table.history {
   table-layout: fixed;
   width: 100%;
@@ -63,4 +71,14 @@ table.history {
 
 table.history td {
   width: 50%;
+}
+
+table.allocations {
+  table-layout: fixed;
+  width: 100%;
+  word-wrap: break-word;
+}
+
+table.allocations th.graph {
+  width: 40%;
 }

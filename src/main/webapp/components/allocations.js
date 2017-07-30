@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts';
 
 export default class Allocations extends Component {
   constructor(props) {
@@ -47,15 +47,15 @@ export default class Allocations extends Component {
     const avg = _.reduce(data, function(sum, d) {
       return sum + d.net;
     }, 0) / data.length;
-    return (
-      <LineChart width={300} height={200} data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+    return (<ResponsiveContainer width="100%" height={100}>
+      <LineChart data={data}>
         <XAxis dataKey="month" />
         <YAxis />
         <Tooltip />
         <ReferenceLine y={avg} stroke="#404E4D" strokeDasharray="3 3" />
         <Line type="monotone" dataKey="net" stroke="#20A4F3" />
-      </LineChart>);
+      </LineChart>
+    </ResponsiveContainer>);
   }
   renderField(fieldName) {
     return (<td key={fieldName}><input
@@ -67,11 +67,11 @@ export default class Allocations extends Component {
   render() {
     //TODO headers
     return (
-      <table className="table table-hover">
+      <table className="table table-hover allocations">
         <thead>
           <tr>
-            {this.props.fields.map((f) => {return <th key={f}>{f}</th>})}
-            <th></th>
+            {this.props.fields.map((f) => {return <th className={f} key={f}>{f}</th>})}
+            <th className="graph"></th>
           </tr>
         </thead>
         <tbody>
