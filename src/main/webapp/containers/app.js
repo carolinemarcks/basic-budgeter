@@ -4,8 +4,7 @@ import { bindActionCreators } from 'redux';
 import TransactionList from './transaction-list';
 import Budgets from './budgets';
 import Goals from './goals';
-import History from './history';
-import MonthProgress from './month-progress';
+import Home from './home';
 import { fetchTransactions, fetchGoals, fetchBudgets } from '../actions';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
@@ -27,9 +26,7 @@ class App extends Component {
             <Tab>Goals</Tab>
           </TabList>
           <TabPanel>
-            <History />
-            <br/>
-            <MonthProgress />
+            <Home />
           </TabPanel>
           <TabPanel>
             <TransactionList />
