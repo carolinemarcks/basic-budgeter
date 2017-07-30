@@ -82,3 +82,14 @@ table.allocations {
 table.allocations th.graph {
   width: 40%;
 }
+
+.custom-tooltip {
+  background-color: #e6e6e6;
+  border-color: #404E4D;
+  border-style: solid;
+  border-width: thin;
+}
+.custom-tooltip p {
+  padding: 5px;
+  margin-bottom: 0px;
+}

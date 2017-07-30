@@ -5,6 +5,7 @@ import TransactionList from './transaction-list';
 import Budgets from './budgets';
 import Goals from './goals';
 import History from './history';
+import MonthProgress from './month-progress';
 import { fetchTransactions, fetchGoals, fetchBudgets } from '../actions';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
@@ -26,7 +27,7 @@ class App extends Component {
             <Tab>Goals</Tab>
           </TabList>
           <TabPanel>
-            <History />
+            <MonthProgress />
           </TabPanel>
           <TabPanel>
             <TransactionList />
