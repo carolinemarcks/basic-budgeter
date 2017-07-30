@@ -31,7 +31,7 @@ trait AllocationBusiness {
 
   def getAll(): Future[(List[Goal], List[Budget])]
 
-  def isIncome(budget: Budget): Boolean
+  def isIncome(goal: Goal): Boolean
 
   def getIncomeId(): Future[Int]
 
@@ -54,7 +54,7 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
     for {
       _ <- queries.createTable()
       _ <- queries.upsertAllocationByName(UNCATEGORIZED, 0, 0, 0, db.model.Budget)
-      _ <- queries.upsertAllocationByName(INCOME, 0, 0, 0, db.model.Budget)
+      _ <- queries.upsertAllocationByName(INCOME, 0, 0, 0, db.model.Goal)
     } yield ()
   }
 
@@ -142,7 +142,7 @@ private[business] class AllocationBusinessImpl(queries: AllocationQueries) exten
     }
   }
 
-  override def isIncome(budget: Budget): Boolean = budget.name == INCOME
+  override def isIncome(goal: Goal): Boolean = goal.name == INCOME
 
   override def getIncomeId(): Future[Int] = {
     queries.getAllocations(Set(INCOME)).map(_.head.id)

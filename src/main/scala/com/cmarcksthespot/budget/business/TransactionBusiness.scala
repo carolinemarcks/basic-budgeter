@@ -127,7 +127,7 @@ private[business] class TransactionBusinessImpl(accountBusiness: AccountBusiness
   }
 
   private def distributeIncome(goals: List[Goal], budgets: List[Budget]): Future[Unit] = {
-    val income = budgets.find(allocationBusiness.isIncome).get
+    val income = goals.find(allocationBusiness.isIncome).get
 
     val (budgetedAmt, newBudgets) = budgets.map { budget =>
       val toAdd = Math.min(budget.amount, budget.cap.getOrElse(Int.MaxValue) - budget.saved)
