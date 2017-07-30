@@ -44,15 +44,12 @@ export default class Allocations extends Component {
         net: net / 100
       }
     });
-    const avg = _.reduce(data, function(sum, d) {
-      return sum + d.net;
-    }, 0) / data.length;
     return (<ResponsiveContainer width="100%" height={100}>
       <LineChart data={data}>
         <XAxis dataKey="month" />
         <YAxis />
         <Tooltip />
-        <ReferenceLine y={avg} stroke="#404E4D" strokeDasharray="3 3" />
+        <ReferenceLine y={allocation.amount / 100} stroke="#404E4D" strokeDasharray="3 3" />
         <Line type="monotone" dataKey="net" stroke="#20A4F3" />
       </LineChart>
     </ResponsiveContainer>);

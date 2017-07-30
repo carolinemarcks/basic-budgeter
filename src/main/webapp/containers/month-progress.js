@@ -18,8 +18,6 @@ class CustomTooltip extends Component {
             <p className="tooltip-label">{`${percent.toFixed(0)}% left of $${amount}`}</p>
           </div>
         );
-      } else {
-        console.log("empty payload", this.props);
       }
     }
 
@@ -36,7 +34,8 @@ CustomTooltip.propTypes = {
 const CustomizedLabel = function(props) {
   const { x, y, width, index, stroke, data, value } = props;
   const content = `$${data[index].saved.toFixed(0)}`;
-  if (value != 0) return <text x={x+ width + 10} y={y} dy={-4} fill={stroke} fontSize={10} textAnchor="right">{content}</text>;
+  const shouldShow = (value != 0) || data[index].saved === 0;
+  if (shouldShow) return <text x={x+ width + 10} y={y} dy={-4} fill={stroke} fontSize={10} textAnchor="right">{content}</text>;
   else return null;
 }
 
