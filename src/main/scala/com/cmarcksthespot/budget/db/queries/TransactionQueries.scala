@@ -84,7 +84,7 @@ private[db] class TransactionQueriesImpl(db: Database) extends TransactionQuerie
   }
 
   override def getUnbalanced(): Future[List[Transaction]] = {
-    db.run(transactions.filter(_.isBalanced).result).map(_.toList)
+    db.run(transactions.filterNot(_.isBalanced).result).map(_.toList)
   }
 
   override def markBalanced(ids: Set[String]): Future[Int] = {

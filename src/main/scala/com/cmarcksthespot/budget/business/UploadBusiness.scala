@@ -17,6 +17,7 @@ class BoaCreditCardUploadBusiness(transactionBusiness: TransactionBusiness, allo
 
   def runUpload(): Future[Unit] = {
     val creditStatementFileNames = List(
+      "new-credit.csv"
       /*
       "January2017_2537.csv",
       "February2017_2537.csv",
@@ -37,9 +38,9 @@ class BoaCreditCardUploadBusiness(transactionBusiness: TransactionBusiness, allo
         }
     }
     val checkingUpload =
-      uploadAcctTransactions(filePath("checking.csv"), checkingAccount.id)
+      uploadAcctTransactions(filePath("new-checking.csv"), checkingAccount.id)
     val savingsUpload =
-      uploadAcctTransactions(filePath("savings.csv"), savingsAccount.id)
+      uploadAcctTransactions(filePath("new-saving.csv"), savingsAccount.id)
 
     Future.sequence(Seq(creditUpload, checkingUpload, savingsUpload)).map { _ => }
   }

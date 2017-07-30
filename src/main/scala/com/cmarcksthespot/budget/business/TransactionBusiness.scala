@@ -196,7 +196,7 @@ private[business] class TransactionBusinessImpl(accountBusiness: AccountBusiness
   override def getHistory(allocationId: Int): List[AllocationMonth] = {
     val byMonthYear = Await.result(queries.transactionsByMonthYear(0, 2017, Some(allocationId)), Duration.Inf).toMap
     //TODO don't hardcode this
-    ((1,2017)::(2,2017)::(3,2017)::(4,2017)::(5, 2017)::(6, 2017)::Nil).map {
+    ((1,2017)::(2,2017)::(3,2017)::(4,2017)::(5, 2017)::(6, 2017)::(7,2017)::Nil).map {
       case my@(month, year) =>
         AllocationMonth(month, year, -byMonthYear.get(my).getOrElse(0))
     }
