@@ -18,10 +18,34 @@ class Predictions extends Component {
       }
     }, 0);
 
-    const goalAlloc = _.reduce(this.props.history, function(sum, d) {
-      const { month, spent, earned } = d
-      return earned + sum;
+    const totalGoalAlloc = _.reduce(this.props.history, function(sum, d) {
+      return d.earned + sum;
     }, 0) / this.props.history.length - nextAlloc;
+
+    const goalStones = _.reduce(this.props.goals, function(sum, d) {
+      return d.weight + sum;
+    }, 0);
+
+    const goalAllocs = _.reduce(this.props.goals, function(accum, goal) {
+      const { name, weight, cap, saved } = goal;
+      if (weight === 0 || saved >= cap) {
+        return accum;
+      } else {
+        const { stonesLeft, amountLeft, deltas } = accum;
+        const toAdd = cap ? Math.min(amountLeft * weight / stonesLeft, cap - saved) : amountLeft * weight / stonesLeft;
+
+        return {
+          stonesLeft : stonesLeft - weight,
+          amountLeft : amountLeft - toAdd,
+          deltas: [...deltas, { name, toAdd }]
+        };
+      }
+    },{stonesLeft: goalStones, amountLeft: totalGoalAlloc, deltas: []}).deltas.map(({ name, toAdd }) => {
+        return (<tr key={name}>
+          <td>{name}</td>
+          <td>${this.formatCentsToMoney(toAdd)}</td>
+        </tr>);
+    });
 
 
     return (
@@ -37,15 +61,16 @@ class Predictions extends Component {
           </tr>
           <tr>
             <td>Predicted $ towards goals:</td>
-            <td>${this.formatCentsToMoney(goalAlloc)}</td>
+            <td>${this.formatCentsToMoney(totalGoalAlloc)}</td>
           </tr>
+          {goalAllocs}
         </tbody>
       </table>);
   }
 }
 
-function mapStateToProps({ budgets, history }){
-  return { budgets, history };
+function mapStateToProps({ budgets, history, goals }){
+  return { budgets, history, goals };
 }
 
 export default connect(mapStateToProps)(Predictions);
